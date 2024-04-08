@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { DatePicker, Space } from 'antd';
 import { Button } from 'antd';
@@ -6,17 +6,19 @@ import dayjs from 'dayjs';
 import { Table } from 'antd';
 import { Checkbox } from 'antd';
 import type { TableColumnsType, TableProps } from 'antd';
+import Students from "../Students/Student-list";
+import axios from "axios";
 type TableRowSelection<T> = TableProps<T>['rowSelection'];
 
 interface DataType {
-    key: React.ReactNode;
+    key: number;
     Stt: number;
     Ho_Ten: string;
     Ngay_sinh: string;
     Co_Mat: JSX.Element;
     Nghi_Co_Phep: JSX.Element;
     Nghi_Khong_Phep: JSX.Element;
-    Trang_Thai: string
+    Trang_Thai: number
 }
 interface DataAllClass {
     classId: string,
@@ -25,6 +27,16 @@ interface DataAllClass {
         schoolBlockId: string,
         schoolBlockName: number
     }
+}
+interface Student {
+    id: number,
+    gender: boolean,
+    firstName: string,
+    lastName: string,
+    birthday: string,
+    address: string,
+    status: number,
+    studentCode: string,
 }
 const Attendences = () => {
     const AllClasses: DataAllClass[] = [{
@@ -272,8 +284,16 @@ const Attendences = () => {
         }
     }
     ];
+    const [student, setStudent] = useState<Student[]>([])
     // cont
-
+    const getStudents = async () => {
+        const s = await axios.get('http://14.248.97.203:4869/api/v1/student/students');
+        setStudent(s.data);
+    }
+    useEffect(() => {
+        getStudents();
+    }, [student])
+    console.log(student[1])
     const rowSelection: TableRowSelection<DataType> = {
         onSelect: (record, selected, selectedRows) => {
             console.log(record, selected, selectedRows);
@@ -282,7 +302,7 @@ const Attendences = () => {
             console.log(selected, selectedRows, changeRows);
         },
     };
-    const columns: TableColumnsType<DataType> = [
+    const columnsAttendenceByDay: TableColumnsType<DataType> = [
         {
             title: 'Stt',
             dataIndex: 'Stt',
@@ -333,132 +353,82 @@ const Attendences = () => {
             align: "center"
         }
     ];
-    const data: DataType[] = [
+    const dataAttendenceByDay = student.map((data) => ({
+        key: data.id,
+        Ho_Ten: data.lastName + data.firstName, // Assuming `s` contains the name of the student
+        Ngay_sinh: data.birthday.split('T')[0],
+        Stt: data.id,
+        Co_Mat: <Checkbox></Checkbox>,
+        Nghi_Co_Phep: <Checkbox></Checkbox>,
+        Nghi_Khong_Phep: <Checkbox></Checkbox>,
+        Trang_Thai: data.studentCode
+    }));
+    const columnsAttendenceByMonth: TableColumnsType<DataType> = [
         {
-            key: 1,
-            Ho_Ten: 'John Brown sr.',
-            Ngay_sinh: "12/1/2012",
-            Stt: 1,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
+            title: 'Stt',
+            dataIndex: 'Stt',
+            key: 'Stt',
+            width: '5%',
+            align: "center"
         },
         {
-            key: 2,
-            Ho_Ten: 'Joe Black',
-            Ngay_sinh: "12/2/2012",
-            Stt: 2,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
+            title: 'Họ tên',
+            dataIndex: 'Ho_Ten',
+            key: 'Ho_Ten',
+            width: '25%',
+            align: "center"
         },
         {
-            key: 1,
-            Ho_Ten: 'John Brown sr.',
-            Ngay_sinh: "12/1/2012",
-            Stt: 1,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
+            title: 'Ngày sinh',
+            dataIndex: 'Ngay_sinh',
+            key: 'Ngay_sinh',
+            width: '14%',
+            align: "center"
         },
         {
-            key: 2,
-            Ho_Ten: 'Joe Black',
-            Ngay_sinh: "12/2/2012",
-            Stt: 2,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
+            title: 'Số Lượt Muộn',
+            dataIndex: 'So_Luot_Muon',
+            key: 'So_Luot_Muon',
+            width: '14%',
+            align: "center"
         },
         {
-            key: 1,
-            Ho_Ten: 'John Brown sr.',
-            Ngay_sinh: "12/1/2012",
-            Stt: 1,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
+            title: 'Tổng Ngày Nghỉ',
+            dataIndex: 'Tong_Ngay_nghi',
+            width: '10%',
+            key: 'Tong_Ngay_nghi',
+            align: "center"
         },
         {
-            key: 2,
-            Ho_Ten: 'Joe Black',
-            Ngay_sinh: "12/2/2012",
-            Stt: 2,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
+            title: 'Nghỉ Có Phép',
+            dataIndex: 'Nghi_Co_Phep',
+            width: '10%',
+            key: 'Nghi_Co_Phep',
+            align: "center"
         },
         {
-            key: 2,
-            Ho_Ten: 'Joe Black',
-            Ngay_sinh: "12/2/2012",
-            Stt: 2,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
-        },
-        {
-            key: 1,
-            Ho_Ten: 'John Brown sr.',
-            Ngay_sinh: "12/1/2012",
-            Stt: 1,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
-        },
-        {
-            key: 2,
-            Ho_Ten: 'Joe Black',
-            Ngay_sinh: "12/2/2012",
-            Stt: 2,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
-        },
-        {
-            key: 2,
-            Ho_Ten: 'Joe Black',
-            Ngay_sinh: "12/2/2012",
-            Stt: 2,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
-        },
-        {
-            key: 1,
-            Ho_Ten: 'John Brown sr.',
-            Ngay_sinh: "12/1/2012",
-            Stt: 1,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
-        },
-        {
-            key: 2,
-            Ho_Ten: 'Joe Black',
-            Ngay_sinh: "12/2/2012",
-            Stt: 2,
-            Co_Mat: <Checkbox></Checkbox>,
-            Nghi_Co_Phep: <Checkbox></Checkbox>,
-            Nghi_Khong_Phep: <Checkbox></Checkbox>,
-            Trang_Thai: 'Chưa thông báo'
+            title: 'Nghỉ không phép',
+            dataIndex: 'Nghi_Khong_Phep',
+            width: '10%',
+            key: 'Nghi_Khong_Phep',
+            align: "center"
         },
     ];
-    const [classes, setClass] = useState("1a1");
+    const dataAttendenceByMonth = student.map((data) => ({
+        key: data.id,
+        Ho_Ten: data.lastName + data.firstName, // Assuming `s` contains the name of the student
+        Ngay_sinh: data.birthday.split('T')[0],
+        Stt: data.id,
+        So_Luot_Muon: 10,
+        Tong_Ngay_nghi: 10,
+        Nghi_Co_Phep: 5,
+        Nghi_Khong_Phep: 5,
+    }));
+
+    const [classes, setClasses] = useState("1a1");
     const [classNameClass, setClassNameClass] = useState("hiddens");
     const choseClass = (className: string) => {
-        setClass(className);
+        setClasses(className);
         setClassNameClass("hiddens")
 
     }
@@ -534,8 +504,8 @@ const Attendences = () => {
                         rowSelection={{
                             ...rowSelection,
                         }}
-                        columns={columns}
-                        dataSource={data}
+                        columns={columnsAttendenceByDay}
+                        dataSource={dataAttendenceByDay}
                         pagination={false}
                         bordered
                         scroll={{ y: 385 }}
@@ -546,8 +516,58 @@ const Attendences = () => {
                 </div>
             </div>
             <div className={`${attendence !== "attendance-by-month" ? "hiddens" : "attendance-by-month"}`}>
-                <div>
-                    Điểm danh theo tháng
+                <div style={{ display: "flex", padding: "16px" }}>
+                    <div className="class">
+                        <div onClick={() => {
+                            if (classNameClass === "hiddens") {
+                                setClassNameClass("show")
+                            } else {
+                                setClassNameClass("hiddens")
+                            }
+                        }} style={{
+                            width: "117px",
+                            padding: "4px 0px 4px 16px",
+                            borderRadius: "3px",
+                            border: "1px solid #3333",
+                            marginRight: "13px"
+                        }}>
+                            {AllClasses.find(c => c.className === classes)?.className}
+                            <IoIosArrowDown style={{
+                                float: "right",
+                                marginRight: "3px",
+                                marginTop: "3px"
+                            }} />
+                        </div>
+                        <div className={classNameClass}>
+
+                            {AllClasses.map((c => (
+                                <div onClick={() => choseClass(c.className)} key={c.classId} className="classItem">
+                                    {c.className}
+                                </div>
+                            )))}
+                        </div>
+
+                    </div>
+                    <Space direction="vertical">
+                        <DatePicker disabledDate={(date) => {
+                            return date.isBefore(dayjs(new Date(`${new Date().getFullYear()}/${new Date().getMonth() + 1}/${new Date().getDate()}`)))
+                        }} />
+                    </Space>
+                </div>
+                <div className="list-student">
+                    <Table
+                        columns={columnsAttendenceByMonth}
+                        dataSource={dataAttendenceByMonth}
+                        pagination={false}
+                        bordered
+                        scroll={{ y: 385 }}
+                    />
+                </div>
+                <div className="submit">
+                    <Button type="primary" className="btn-submit">Lưu Lại</Button>
+                </div>
+                <div className="submit">
+                    <Button type="primary" className="btn-submit">Sửa Đổi</Button>
                 </div>
             </div>
 
