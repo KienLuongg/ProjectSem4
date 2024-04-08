@@ -296,7 +296,7 @@ export default function Students() {
         />
         <Column
           title="Họ và tên"
-          dataIndex="full_name"
+          dataIndex="firstName"
           width={200}
           align="center"
           className="custom-column"
