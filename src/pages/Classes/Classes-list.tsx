@@ -2,12 +2,43 @@ import { Button, Col, Row, Select, Form, Input, Table, Modal, Radio, DatePicker 
 import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
+import { Link } from 'react-router-dom';
 
 const options = [
     { value: '1A1', label: '1A1' },
     { value: '1A2', label: '1A2' },
     { value: '1A3', label: '1A3' },
 ];
+
+interface ClassData {
+    id: string;
+    classCode: string;
+    name: string;
+    room: string;
+    teacher: string;
+    grade: string;
+}
+
+const fakeData = [
+    {
+        key: '1',
+        classCode: '10A1',
+        name: 'Lớp 10A1',
+        room: 'Phòng 101',
+        teacher: 'Nguyễn Văn A',
+        grade: '10',
+    },
+    {
+        key: '2',
+        classCode: '11B2',
+        name: 'Lớp 11B2',
+        room: 'Phòng 102',
+        teacher: 'Trần Thị B',
+        grade: '11',
+    },
+    // Add more fake data objects as needed
+];
+
 
 const renderSTT = (text: string, record: string, index: number) => <span>{index + 1}</span>;
 
@@ -181,6 +212,7 @@ export default function Classes() {
                 </Col>
             </Row>
             <Table
+                dataSource={fakeData}
                 style={{
                     border: '1px solid #ddd',
                     borderRadius: '5px',
@@ -194,28 +226,47 @@ export default function Classes() {
             >
                 <Column
                     title="STT"
-                    render={renderSTT}
+                    render={(text, record, index) => index + 1}
                     width={50}
                     align="center"
                     className="custom-column"
                 />
                 <Column
-                    title="Mã học sinh"
+                    title="Mã lớp"
+                    dataIndex="classCode"
                     width={120}
                     align="center"
                     className="custom-column"
                 />
                 <Column
-                    title="Họ và tên"
+                    title="Tên lớp"
                     dataIndex="name"
                     width={200}
                     align="center"
                     className="custom-column"
+                // render={(text, record: ClassData) => (
+                //     <Link to={`/details/${record.id}`} style={{ color: 'blue' }}>{text}</Link>)}
                 />
-                <Column title="Status" align="center" className="custom-column" />
-                <Column title="Ngày sinh" align="center" className="custom-column" />
-                <Column title="Nơi sinh" align="center" className="custom-column" />
+                <Column
+                    title="Tên phòng"
+                    dataIndex="room"
+                    align="center"
+                    className="custom-column"
+                />
+                <Column
+                    title="Giáo viên chủ nhiệm"
+                    dataIndex="teacher"
+                    align="center"
+                    className="custom-column"
+                />
+                <Column
+                    title="Khối"
+                    dataIndex="grade"
+                    align="center"
+                    className="custom-column"
+                />
             </Table>
+
         </div>
     );
 }

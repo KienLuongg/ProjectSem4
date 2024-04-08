@@ -11,17 +11,17 @@ const mainAxios = axios.create({
   },
 });
 
-mainAxios.interceptors.request.use(
-  (config) => {
-    const token = getCookie(Storage.token);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// mainAxios.interceptors.request.use(
+//   (config) => {
+//     const token = getCookie(Storage.token);
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 export default mainAxios;

@@ -2,6 +2,8 @@ import { Button, Col, Row, Select, Form, Input, Table, Modal, Radio, DatePicker 
 import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const options = [
   { value: '1A1', label: '1A1' },
@@ -9,10 +11,63 @@ const options = [
   { value: '1A3', label: '1A3' },
 ];
 
+interface StudentData {
+  id: string;
+  studentCode: string;
+  full_name: {
+    firstName: string;
+    lastName: string;
+  };
+  address: string;
+  birthday: string;
+  birthplace: string;
+  gender: string;
+  status: string;
+}
+
+// const fakeData: StudentData[] = [
+//   {
+//     key: '1',
+//     studentCode: '001',
+//     name: 'John Doe',
+//     status: 'Active',
+//     birthdate: '1990-01-01',
+//     birthplace: 'City A'
+//   },
+//   {
+//     key: '2',
+//     studentCode: '002',
+//     name: 'Jane Smith',
+//     status: 'Inactive',
+//     birthdate: '1995-05-15',
+//     birthplace: 'City B'
+//   },
+//   // Add more fake data objects as needed
+// ];
+
+
 const renderSTT = (text: string, record: string, index: number) => <span>{index + 1}</span>;
 
 export default function Students() {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [students, setStudents] = useState<StudentData[]>([]);
+
+
+  useEffect(() => {
+    // Fetch data for the table on component mount
+    axios.get('http://14.248.97.203:4869/api/v1/student/students')
+      .then(response => {
+        // Update state with fetched data
+        setStudents(response.data);
+        console.log("Fetched students:", response.data); // Log fetched students
+      })
+      .catch(error => {
+        // Handle error
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
+
 
   // Hàm để mở modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,18 +76,27 @@ export default function Students() {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
-  // const handleEditButtonClick = (record) => {
-  //   // Redirect to the edit page for the specific student
-  //   navigate(`/edit-student/${record.studentId}`);
-  // };
+  const handleSubmit = (formData: any) => {
+    // Make POST request to submit form data
+    axios.post('http://14.248.97.203:4869/api/v1/students', formData)
+      .then(response => {
+        // Handle successful submission
+        console.log('Data submitted:', response.data);
+        // Close modal
+        setIsModalOpen(false);
+        // Optionally, you can fetch updated data for the table here
+      })
+      .catch(error => {
+        // Handle error
+        console.error('Error submitting data:', error);
+      });
+  };
+
   return (
     <div>
       <Breadcrumb pageName='Students' />
@@ -134,8 +198,16 @@ export default function Students() {
               <Modal
                 title="Thêm học sinh"
                 open={isModalOpen}
-                onOk={handleOk}
                 onCancel={handleCancel}
+                footer={[
+                  <Button key="back" onClick={handleCancel}>
+                    Cancel
+                  </Button>,
+                  <Button key="submit" type="primary" onClick={handleSubmit}>
+                    Submit
+                  </Button>,
+                ]}
+
               >
                 <div>
                   <Form
@@ -149,7 +221,7 @@ export default function Students() {
                   >
                     <Form.Item
                       label="Họ:"
-                      name="lastname"
+                      name="lastName"
                       rules={[{ required: true, message: 'Please input!' }]}
                     >
                       <Input />
@@ -157,7 +229,7 @@ export default function Students() {
 
                     <Form.Item
                       label="Tên:"
-                      name="firstname"
+                      name="firstName"
                       rules={[{ required: true, message: 'Please input!' }]}
                     >
                       <Input />
@@ -165,7 +237,7 @@ export default function Students() {
 
                     <Form.Item
                       label="Ngày sinh:"
-                      name="Dob"
+                      name="birthday"
                       rules={[{ required: true, message: 'Please input!' }]}
                     >
                       <DatePicker />
@@ -196,7 +268,7 @@ export default function Students() {
           </Form.Item>
         </Col>
       </Row>
-      <Table
+      <Table dataSource={students}
         style={{
           border: '1px solid #ddd',
           borderRadius: '5px',
@@ -217,20 +289,21 @@ export default function Students() {
         />
         <Column
           title="Mã học sinh"
+          dataIndex="studentCode"
           width={120}
           align="center"
           className="custom-column"
         />
         <Column
           title="Họ và tên"
-          dataIndex="name"
+          dataIndex="full_name"
           width={200}
           align="center"
           className="custom-column"
         />
-        <Column title="Status" align="center" className="custom-column" />
-        <Column title="Ngày sinh" align="center" className="custom-column" />
-        <Column title="Nơi sinh" align="center" className="custom-column" />
+        <Column title="Ngày sinh" dataIndex="birthday" align="center" className="custom-column" />
+        <Column title="Nơi sinh" dataIndex="address" align="center" className="custom-column" />
+        <Column title="Status" dataIndex="status" align="center" className="custom-column" />
       </Table>
     </div>
   );

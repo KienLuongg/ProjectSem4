@@ -2,6 +2,7 @@ import { Button, Col, Row, Select, Form, Input, Table, Modal, Radio, DatePicker 
 import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
+import axios from 'axios';
 
 const options = [
   { value: '1A1', label: '1A1' },
@@ -9,10 +10,33 @@ const options = [
   { value: '1A3', label: '1A3' },
 ];
 
+interface SchoolYearsData {
+  id: string;
+  startSem1: string;
+  startSem2: string;
+  end: string;
+}
+
 const renderSTT = (text: string, record: string, index: number) => <span>{index + 1}</span>;
 
 export default function SchoolYears() {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [schoolYears, setSchoolYears] = useState<SchoolYearsData[]>([]);
+
+
+  useEffect(() => {
+    // Fetch data for the table on component mount
+    axios.get('http://14.248.97.203:4869/api/v1/school/school-year')
+      .then(response => {
+        // Update state with fetched data
+        setSchoolYears(response.data);
+        console.log("Fetched:", response.data); // Log fetched students
+      })
+      .catch(error => {
+        // Handle error
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
   // Hàm để mở modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,14 +44,26 @@ export default function SchoolYears() {
   const showModal = () => {
     setIsModalOpen(true);
   };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+  const handleSubmit = (formData: any) => {
+    // Make POST request to submit form data
+    axios.post('http://14.248.97.203:4869/api/v1/school/creat-school-year', formData)
+      .then(response => {
+        // Handle successful submission
+        console.log('Data submitted:', response.data);
+        // Close modal
+        setIsModalOpen(false);
+        // Optionally, you can fetch updated data for the table here
+      })
+      .catch(error => {
+        // Handle error
+        console.error('Error submitting data:', error);
+      });
+  };
+
 
   // const handleEditButtonClick = (record) => {
   //   // Redirect to the edit page for the specific student
@@ -69,8 +105,15 @@ export default function SchoolYears() {
               <Modal
                 title="Thêm năm học"
                 open={isModalOpen}
-                onOk={handleOk}
                 onCancel={handleCancel}
+                footer={[
+                  <Button key="back" onClick={handleCancel}>
+                    Cancel
+                  </Button>,
+                  <Button key="submit" type="primary" onClick={handleSubmit}>
+                    Submit
+                  </Button>,
+                ]}
               >
                 <div>
                   <Form
@@ -82,14 +125,6 @@ export default function SchoolYears() {
                     colon={false}
                     style={{ maxWidth: 600 }}
                   >
-                    <Form.Item
-                      label="Năm học:"
-                      name="school-year"
-                      rules={[{ required: true, message: 'Please input!' }]}
-                    >
-                      <Input />
-                    </Form.Item>
-
                     <Form.Item
                       label="Thời gian bắt đầu học kỳ I:"
                       name="sem1"
@@ -123,6 +158,7 @@ export default function SchoolYears() {
         </Col>
       </Row>
       <Table
+        dataSource={schoolYears}
         style={{
           border: '1px solid #ddd',
           borderRadius: '5px',
@@ -136,24 +172,38 @@ export default function SchoolYears() {
       >
         <Column
           title="STT"
-          render={renderSTT}
+          render={(text, record, index) => index + 1} // Renders the row number starting from 1
           width={50}
           align="center"
           className="custom-column"
         />
         <Column
           title="Năm học"
+          dataIndex="id"
           width={120}
           align="center"
           className="custom-column"
         />
         <Column
           title="Học kỳ I"
+          dataIndex="startSem1"
           align="center"
           className="custom-column"
         />
-        <Column title="Học kỳ II" align="center" className="custom-column" />
+        <Column
+          title="Học kỳ II"
+          dataIndex="startSem2"
+          align="center"
+          className="custom-column"
+        />
+        <Column
+          title="Kết thúc"
+          dataIndex="end"
+          align="center"
+          className="custom-column"
+        />
       </Table>
+
     </div>
   );
 }
