@@ -2,12 +2,43 @@ import { Button, Col, Row, Select, Form, Input, Table, Modal, Radio, DatePicker 
 import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
+import { Link } from 'react-router-dom';
 
 const options = [
     { value: '1A1', label: '1A1' },
     { value: '1A2', label: '1A2' },
     { value: '1A3', label: '1A3' },
 ];
+
+interface ClassData {
+    id: string;
+    classCode: string;
+    name: string;
+    room: string;
+    teacher: string;
+    grade: string;
+}
+
+const fakeData = [
+    {
+        key: '1',
+        classCode: '10A1',
+        name: 'Lớp 10A1',
+        room: 'Phòng 101',
+        teacher: 'Nguyễn Văn A',
+        grade: '10',
+    },
+    {
+        key: '2',
+        classCode: '11B2',
+        name: 'Lớp 11B2',
+        room: 'Phòng 102',
+        teacher: 'Trần Thị B',
+        grade: '11',
+    },
+    // Add more fake data objects as needed
+];
+
 
 
 export default function Classes() {

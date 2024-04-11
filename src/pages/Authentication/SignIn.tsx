@@ -81,20 +81,21 @@ const SignIn = () => {
     <>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark mt-27">
         <div className="flex flex-wrap items-center">
+          {/* Logo */}
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
-              <Link className="mb-5.5 inline-block" to="/">
-                <img
-                  className="hidden dark:block"
-                  src="http://www.schooladmin.io/images/main-logo.png"
-                  alt="Logo"
-                />
-                <img
-                  className="dark:hidden"
-                  src="http://www.schooladmin.io/images/main-logo.png"
-                  alt="Logo"
-                />
-              </Link>
+
+              <img
+                className="hidden dark:block"
+                src="http://www.schooladmin.io/images/main-logo.png"
+                alt="Logo"
+              />
+              <img
+                className="dark:hidden"
+                src="http://www.schooladmin.io/images/main-logo.png"
+                alt="Logo"
+              />
+
 
               <p className="2xl:px-20">Cùng Trải Nghiệm Thống</p>
               <span className="mt-15 inline-block">

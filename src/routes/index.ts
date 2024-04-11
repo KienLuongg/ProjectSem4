@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 
+const Attendence = lazy(() => import('../pages/Attendence/Attendence'))
 const Students = lazy(() => import('../pages/Students/Student-list'));
 const SchoolYears = lazy(() => import('../pages/School-years/School-years'));
 const ClassesList = lazy(() => import('../pages/Classes/Classes-list'));
@@ -32,6 +33,11 @@ const coreRoutes = [
     path: '/teachers',
     title: 'Teachers',
     component: Teachers,
+  },
+  {
+    path: '/attendence',
+    title: 'Attendence',
+    component: Attendence,
   },
 ];
 
