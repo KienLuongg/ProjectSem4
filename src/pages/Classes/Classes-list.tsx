@@ -9,10 +9,8 @@ const options = [
     { value: '1A3', label: '1A3' },
 ];
 
-const renderSTT = (text: string, record: string, index: number) => <span>{index + 1}</span>;
 
 export default function Classes() {
-    const [isModalVisible, setIsModalVisible] = useState(false);
 
     // Hàm để mở modal
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,10 +27,6 @@ export default function Classes() {
         setIsModalOpen(false);
     };
 
-    // const handleEditButtonClick = (record) => {
-    //   // Redirect to the edit page for the specific student
-    //   navigate(`/edit-student/${record.studentId}`);
-    // };
     return (
         <div>
             <Breadcrumb pageName='Classes' />
@@ -180,42 +174,7 @@ export default function Classes() {
                     </Form.Item>
                 </Col>
             </Row>
-            <Table
-                style={{
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    overflow: 'hidden',
-                    maxHeight: 380,
-                }}
-                bordered
-                size="middle"
-                virtual
-                scroll={{ y: 380 }}
-            >
-                <Column
-                    title="STT"
-                    render={renderSTT}
-                    width={50}
-                    align="center"
-                    className="custom-column"
-                />
-                <Column
-                    title="Mã học sinh"
-                    width={120}
-                    align="center"
-                    className="custom-column"
-                />
-                <Column
-                    title="Họ và tên"
-                    dataIndex="name"
-                    width={200}
-                    align="center"
-                    className="custom-column"
-                />
-                <Column title="Status" align="center" className="custom-column" />
-                <Column title="Ngày sinh" align="center" className="custom-column" />
-                <Column title="Nơi sinh" align="center" className="custom-column" />
-            </Table>
+
         </div>
     );
 }

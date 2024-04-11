@@ -1,7 +1,20 @@
-import { Button, Col, Row, Select, Form, Input, Table, Modal, Radio, DatePicker } from 'antd';
+import {
+  Button,
+  Col,
+  Row,
+  Select,
+  Form,
+  Input,
+  Table,
+  Modal,
+  Radio,
+  DatePicker,
+} from 'antd';
 import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const options = [
   { value: '1A1', label: '1A1' },
@@ -9,10 +22,36 @@ const options = [
   { value: '1A3', label: '1A3' },
 ];
 
-const renderSTT = (text: string, record: string, index: number) => <span>{index + 1}</span>;
+interface StudentData {
+  id: string;
+  studentCode: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  birthday: Date;
+  gender: string;
+  status: string;
+}
+
+const renderSTT = (text: string, record: string, index: number) => (
+  <span>{index + 1}</span>
+);
 
 export default function Students() {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [students, setStudents] = useState<StudentData[]>([]);
+
+  useEffect(() => {
+    axios
+      .get('http://14.248.97.203:4869/api/v1/student/students')
+      .then((response) => {
+        setStudents(response.data);
+        console.log('Fetched students:', response.data); // Log fetched students
+      })
+      .catch((error) => {
+        // Handle error
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
   // Hàm để mở modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,21 +60,26 @@ export default function Students() {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
-  // const handleEditButtonClick = (record) => {
-  //   // Redirect to the edit page for the specific student
-  //   navigate(`/edit-student/${record.studentId}`);
-  // };
+  const handleSubmit = (formData: any) => {
+    // Make POST request to submit form data
+    axios
+      .post('http://14.248.97.203:4869/api/v1/students', formData)
+      .then((response) => {
+        console.log('Data submitted:', response.data);
+        setIsModalOpen(false);
+      })
+      .catch((error) => {
+        console.error('Error submitting data:', error);
+      });
+  };
+
   return (
     <div>
-      <Breadcrumb pageName='Students' />
+      <Breadcrumb pageName="Students" />
       <Row style={{ marginBottom: '20px' }}>
         {/* Năm học */}
         <Col span={6}>
@@ -47,7 +91,11 @@ export default function Students() {
             wrapperCol={{ span: 24 }}
             style={{ marginBottom: '8px' }}
           >
-            <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
+            <Select
+              options={options}
+              defaultValue={options[0].value}
+              style={{ width: '80%' }}
+            />
           </Form.Item>
         </Col>
         {/* Khối */}
@@ -60,7 +108,11 @@ export default function Students() {
             wrapperCol={{ span: 24 }}
             style={{ marginBottom: '8px' }}
           >
-            <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
+            <Select
+              options={options}
+              defaultValue={options[0].value}
+              style={{ width: '80%' }}
+            />
           </Form.Item>
         </Col>
         {/* Lớp */}
@@ -73,7 +125,11 @@ export default function Students() {
             wrapperCol={{ span: 24 }}
             style={{ marginBottom: '8px' }}
           >
-            <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
+            <Select
+              options={options}
+              defaultValue={options[0].value}
+              style={{ width: '80%' }}
+            />
           </Form.Item>
         </Col>
         {/* Giới tính */}
@@ -86,7 +142,11 @@ export default function Students() {
             wrapperCol={{ span: 24 }}
             style={{ marginBottom: '8px' }}
           >
-            <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
+            <Select
+              options={options}
+              defaultValue={options[0].value}
+              style={{ width: '80%' }}
+            />
           </Form.Item>
         </Col>
       </Row>
@@ -101,7 +161,11 @@ export default function Students() {
             wrapperCol={{ span: 24 }}
             style={{ marginBottom: '8px' }}
           >
-            <Input type="text" placeholder="Điền tên học sinh" style={{ width: '80%' }} />
+            <Input
+              type="text"
+              placeholder="Điền tên học sinh"
+              style={{ width: '80%' }}
+            />
           </Form.Item>
         </Col>
         {/* Tìm kiếm theo mã */}
@@ -114,7 +178,11 @@ export default function Students() {
             wrapperCol={{ span: 24 }}
             style={{ marginBottom: '8px' }}
           >
-            <Input type="text" placeholder="Điền mã học sinh" style={{ width: '80%' }} />
+            <Input
+              type="text"
+              placeholder="Điền mã học sinh"
+              style={{ width: '80%' }}
+            />
           </Form.Item>
         </Col>
         <Col span={12} style={{ textAlign: 'right' }}>
@@ -128,14 +196,25 @@ export default function Students() {
           >
             <div>
               <Button type="primary">Tìm kiếm</Button>
-              <Button type="default" onClick={showModal} style={{ marginLeft: '20px' }}>
+              <Button
+                type="default"
+                onClick={showModal}
+                style={{ marginLeft: '20px' }}
+              >
                 Thêm
               </Button>
               <Modal
                 title="Thêm học sinh"
                 open={isModalOpen}
-                onOk={handleOk}
                 onCancel={handleCancel}
+                footer={[
+                  <Button key="back" onClick={handleCancel}>
+                    Cancel
+                  </Button>,
+                  <Button key="submit" type="primary" onClick={handleSubmit}>
+                    Submit
+                  </Button>,
+                ]}
               >
                 <div>
                   <Form
@@ -149,7 +228,7 @@ export default function Students() {
                   >
                     <Form.Item
                       label="Họ:"
-                      name="lastname"
+                      name="lastName"
                       rules={[{ required: true, message: 'Please input!' }]}
                     >
                       <Input />
@@ -157,7 +236,7 @@ export default function Students() {
 
                     <Form.Item
                       label="Tên:"
-                      name="firstname"
+                      name="firstName"
                       rules={[{ required: true, message: 'Please input!' }]}
                     >
                       <Input />
@@ -165,7 +244,7 @@ export default function Students() {
 
                     <Form.Item
                       label="Ngày sinh:"
-                      name="Dob"
+                      name="birthday"
                       rules={[{ required: true, message: 'Please input!' }]}
                     >
                       <DatePicker />
@@ -196,41 +275,19 @@ export default function Students() {
           </Form.Item>
         </Col>
       </Row>
-      <Table
-        style={{
-          border: '1px solid #ddd',
-          borderRadius: '5px',
-          overflow: 'hidden',
-          maxHeight: 380,
-        }}
-        bordered
-        size="middle"
-        virtual
-        scroll={{ y: 380 }}
-      >
-        <Column
-          title="STT"
-          render={renderSTT}
-          width={50}
-          align="center"
-          className="custom-column"
-        />
-        <Column
-          title="Mã học sinh"
-          width={120}
-          align="center"
-          className="custom-column"
-        />
-        <Column
+      {/* Bảng hiển thị danh sách học sinh */}
+      <Table dataSource={students} rowKey="id">
+        <Table.Column title="Mã học sinh" dataIndex="studentCode" />
+        <Table.Column
           title="Họ và tên"
-          dataIndex="name"
-          width={200}
-          align="center"
-          className="custom-column"
+          render={(text, record: StudentData) =>
+            `${record.firstName} ${record.lastName}`
+          }
         />
-        <Column title="Status" align="center" className="custom-column" />
-        <Column title="Ngày sinh" align="center" className="custom-column" />
-        <Column title="Nơi sinh" align="center" className="custom-column" />
+        <Table.Column title="Ngày sinh" dataIndex="birthday" />
+        <Table.Column title="Giới tính" dataIndex="gender" />
+        <Table.Column title="Địa chỉ" dataIndex="address" />
+        <Table.Column title="Trạng thái" dataIndex="status" />
       </Table>
     </div>
   );
