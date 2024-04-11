@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 
 const getPrefixKey = (key: string) => `${Storage.prefix}-${key}`;
 
-export const setCookie = (cname: string, cvalue: string, exdays = 30) => {
+export const setCookie = (cname: string, cvalue: string, exdays = 1) => {
   return Cookies.set(getPrefixKey(cname), cvalue, { expires: exdays });
 };
 

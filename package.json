@@ -1,17 +1,13 @@
 {
-  "name": "tailadmin-react-free",
+  "name": "project",
   "private": true,
   "version": "1.0.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
-  },
-  "author": {
-    "name": "TailAdmin",
-    "email": "hello@tailadmin.com",
-    "url": "https://tailadmin.com"
+    "preview": "vite preview",
+    "test": "vite --test"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.3",
