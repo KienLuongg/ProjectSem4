@@ -10,10 +10,8 @@ import {
   Radio,
   DatePicker,
 } from 'antd';
-import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const options = [
@@ -32,10 +30,6 @@ interface StudentData {
   gender: string;
   status: string;
 }
-
-const renderSTT = (text: string, record: string, index: number) => (
-  <span>{index + 1}</span>
-);
 
 export default function Students() {
   const [students, setStudents] = useState<StudentData[]>([]);
