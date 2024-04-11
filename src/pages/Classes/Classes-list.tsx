@@ -10,40 +10,8 @@ const options = [
     { value: '1A3', label: '1A3' },
 ];
 
-interface ClassData {
-    id: string;
-    classCode: string;
-    name: string;
-    room: string;
-    teacher: string;
-    grade: string;
-}
-
-const fakeData = [
-    {
-        key: '1',
-        classCode: '10A1',
-        name: 'Lớp 10A1',
-        room: 'Phòng 101',
-        teacher: 'Nguyễn Văn A',
-        grade: '10',
-    },
-    {
-        key: '2',
-        classCode: '11B2',
-        name: 'Lớp 11B2',
-        room: 'Phòng 102',
-        teacher: 'Trần Thị B',
-        grade: '11',
-    },
-    // Add more fake data objects as needed
-];
-
-
-const renderSTT = (text: string, record: string, index: number) => <span>{index + 1}</span>;
 
 export default function Classes() {
-    const [isModalVisible, setIsModalVisible] = useState(false);
 
     // Hàm để mở modal
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,10 +28,6 @@ export default function Classes() {
         setIsModalOpen(false);
     };
 
-    // const handleEditButtonClick = (record) => {
-    //   // Redirect to the edit page for the specific student
-    //   navigate(`/edit-student/${record.studentId}`);
-    // };
     return (
         <div>
             <Breadcrumb pageName='Classes' />
@@ -211,61 +175,6 @@ export default function Classes() {
                     </Form.Item>
                 </Col>
             </Row>
-            <Table
-                dataSource={fakeData}
-                style={{
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    overflow: 'hidden',
-                    maxHeight: 380,
-                }}
-                bordered
-                size="middle"
-                virtual
-                scroll={{ y: 380 }}
-            >
-                <Column
-                    title="STT"
-                    render={(text, record, index) => index + 1}
-                    width={50}
-                    align="center"
-                    className="custom-column"
-                />
-                <Column
-                    title="Mã lớp"
-                    dataIndex="classCode"
-                    width={120}
-                    align="center"
-                    className="custom-column"
-                />
-                <Column
-                    title="Tên lớp"
-                    dataIndex="name"
-                    width={200}
-                    align="center"
-                    className="custom-column"
-                // render={(text, record: ClassData) => (
-                //     <Link to={`/details/${record.id}`} style={{ color: 'blue' }}>{text}</Link>)}
-                />
-                <Column
-                    title="Tên phòng"
-                    dataIndex="room"
-                    align="center"
-                    className="custom-column"
-                />
-                <Column
-                    title="Giáo viên chủ nhiệm"
-                    dataIndex="teacher"
-                    align="center"
-                    className="custom-column"
-                />
-                <Column
-                    title="Khối"
-                    dataIndex="grade"
-                    align="center"
-                    className="custom-column"
-                />
-            </Table>
 
         </div>
     );
