@@ -9,6 +9,9 @@
     "preview": "vite preview",
     "test": "npx jest"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.3",
     "antd": "^5.16.0",
