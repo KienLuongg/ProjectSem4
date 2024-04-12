@@ -1,8 +1,7 @@
 import { Button, Col, Row, Select, Form, Input, Table, Modal, Radio, DatePicker } from 'antd';
-import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
-import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const options = [
     { value: '1A1', label: '1A1' },
@@ -10,8 +9,31 @@ const options = [
     { value: '1A3', label: '1A3' },
 ];
 
+interface ClassesData {
+    id: string;
+    gradeId: string;
+    schoolYearId: string;
+    teacherSchoolYearId: string;
+    roomId: string;
+    className: Date;
+    classCode: string;
+}
 
 export default function Classes() {
+    const [classes, setClasses] = useState<ClassesData[]>([]);
+
+    useEffect(() => {
+        axios
+            .get('http://14.248.97.203:4869/api/v1/school/school-year-class')
+            .then((response) => {
+                setClasses(response.data);
+                console.log('Fetched students:', response.data);
+            })
+            .catch((error) => {
+                // Handle error
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
     // Hàm để mở modal
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,14 +42,22 @@ export default function Classes() {
         setIsModalOpen(true);
     };
 
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
-
     const handleCancel = () => {
         setIsModalOpen(false);
     };
 
+    const handleSubmit = (formData: any) => {
+        // Make POST request to submit form data
+        axios
+            .post('http://14.248.97.203:4869/api/v1/school/creat-school-year-class', formData)
+            .then((response) => {
+                console.log('Data submitted:', response.data);
+                setIsModalOpen(false);
+            })
+            .catch((error) => {
+                console.error('Error submitting data:', error);
+            });
+    };
     return (
         <div>
             <Breadcrumb pageName='Classes' />
@@ -105,8 +135,15 @@ export default function Classes() {
                             <Modal
                                 title="Thêm học sinh"
                                 open={isModalOpen}
-                                onOk={handleOk}
                                 onCancel={handleCancel}
+                                footer={[
+                                    <Button key="back" onClick={handleCancel}>
+                                        Cancel
+                                    </Button>,
+                                    <Button key="submit" type="primary" onClick={handleSubmit}>
+                                        Submit
+                                    </Button>,
+                                ]}
                             >
                                 <div>
                                     <Form
@@ -175,7 +212,14 @@ export default function Classes() {
                     </Form.Item>
                 </Col>
             </Row>
-
+            <Table dataSource={classes} rowKey="id">
+                <Table.Column title="Lớp" dataIndex="className" />
+                <Table.Column title="Mã lớp" dataIndex="classCode" />
+                <Table.Column title="Phòng" dataIndex="roomId" />
+                <Table.Column title="Khối" dataIndex="gradeId" />
+                <Table.Column title="Năm học" dataIndex="schoolYearId" />
+                <Table.Column title="Giáo viên" dataIndex="teacherSchoolYearId" />
+            </Table>
         </div>
     );
 }
