@@ -35,7 +35,7 @@ export default function Teachers() {
 
     useEffect(() => {
         // Fetch data for the table on component mount
-        axios.get('http://14.248.97.203:4869/api/v1/teacher/teachers')
+        axios.get('http://14.248.97.203:4869/api/v1/school/teacher-school-year')
             .then(response => {
                 // Update state with fetched data
                 setTeachers(response.data);
@@ -75,99 +75,6 @@ export default function Teachers() {
     return (
         <div>
             <Breadcrumb pageName='Classes' />
-            <Row style={{ marginBottom: '20px' }}>
-                <Col span={6}>
-                    <Form.Item
-                        label="Giới tính"
-                        labelAlign="left"
-                        colon={false}
-                        labelCol={{ span: 24 }}
-                        wrapperCol={{ span: 24 }}
-                        style={{ marginBottom: '8px' }}
-                    >
-                        <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
-                    </Form.Item>
-                </Col>
-
-                <Col span={6}>
-                    <Form.Item
-                        label="Chức vụ"
-                        labelAlign="left"
-                        colon={false}
-                        labelCol={{ span: 24 }}
-                        wrapperCol={{ span: 24 }}
-                        style={{ marginBottom: '8px' }}
-                    >
-                        <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
-                    </Form.Item>
-                </Col>
-
-                <Col span={6}>
-                    <Form.Item
-                        label="Dạy môn"
-                        labelAlign="left"
-                        colon={false}
-                        labelCol={{ span: 24 }}
-                        wrapperCol={{ span: 24 }}
-                        style={{ marginBottom: '8px' }}
-                    >
-                        <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
-                    </Form.Item>
-                </Col>
-
-                <Col span={6}>
-                    <Form.Item
-                        label="Phòng ban"
-                        labelAlign="left"
-                        colon={false}
-                        labelCol={{ span: 24 }}
-                        wrapperCol={{ span: 24 }}
-                        style={{ marginBottom: '8px' }}
-                    >
-                        <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
-                    </Form.Item>
-                </Col>
-
-                <Col span={6}>
-                    <Form.Item
-                        label="Trạng thái làm việc"
-                        labelAlign="left"
-                        colon={false}
-                        labelCol={{ span: 24 }}
-                        wrapperCol={{ span: 24 }}
-                        style={{ marginBottom: '8px' }}
-                    >
-                        <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
-                    </Form.Item>
-                </Col>
-
-                {/* Tìm kiếm theo tên */}
-                <Col span={6}>
-                    <Form.Item
-                        label="Tên"
-                        labelAlign="left"
-                        colon={false}
-                        labelCol={{ span: 24 }}
-                        wrapperCol={{ span: 24 }}
-                        style={{ marginBottom: '8px' }}
-                    >
-                        <Input type="text" placeholder="Điền tên giáo viên" style={{ width: '80%' }} />
-                    </Form.Item>
-                </Col>
-                {/* Tìm kiếm theo mã */}
-                <Col span={6}>
-                    <Form.Item
-                        label="Số hiệu cán bộ"
-                        labelAlign="left"
-                        colon={false}
-                        labelCol={{ span: 24 }}
-                        wrapperCol={{ span: 24 }}
-                        style={{ marginBottom: '8px' }}
-                    >
-                        <Input type="text" placeholder="Điền số hiệu" style={{ width: '80%' }} />
-                    </Form.Item>
-                </Col>
-            </Row>
             <Row style={{ marginBottom: '15px' }}>
                 <Col span={24} style={{ textAlign: 'right' }}>
                     <Form.Item
@@ -179,7 +86,7 @@ export default function Teachers() {
                         style={{ marginBottom: '8px', paddingRight: '56px' }}
                     >
                         <div>
-                            <Button type="primary">Tìm kiếm</Button>
+                            <Button type="primary">Nhập</Button>
                             <Button type="default" onClick={showModal} style={{ marginLeft: '20px' }}>
                                 Thêm
                             </Button>
