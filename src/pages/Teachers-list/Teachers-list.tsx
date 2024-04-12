@@ -1,7 +1,5 @@
-import { Link } from 'react-router-dom';
 import { Button, Col, Form, Input, Row, Select, Table, Modal, DatePicker, Radio, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
 import axios from 'axios';

@@ -7,11 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-<<<<<<< HEAD
     "test": "npx jest"
-=======
-    "test": "jest"
->>>>>>> origin/main
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.3",
