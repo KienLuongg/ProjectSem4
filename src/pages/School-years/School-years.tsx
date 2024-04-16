@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Col, Row, Form, Input, Table, Modal, DatePicker, message } from 'antd';
 import axios from 'axios';
-import teacherApi from '../../apis/urlApi';
 
 interface SchoolYearsData {
   id: number;
@@ -37,28 +36,33 @@ export default function SchoolYears() {
     setIsModalOpen(false);
   };
 
-  const handleSubmit = () => {
-    form.validateFields()
-      .then(formData => {
-        // Call postCreateSchoolYear function from teacherApi
-        teacherApi.postCreateSchoolYear(formData)
-          .then(response => {
-            console.log('Data submitted:', response.data);
-            setIsModalOpen(false);
-            // Refresh school years data after successful submission
-            fetchData(); // Change from fetchSchoolYears() to fetchData()
-          })
-          .catch(error => {
-            console.error('Error submitting data:', error);
-            // Display error message to the user
-            message.error('Failed to submit data. Please try again later.');
-          });
-      })
-      .catch(error => {
-        console.error('Form validation failed:', error);
-        // Display error message to the user
-        message.error('Form validation failed. Please check the fields and try again.');
-      });
+  const handleSubmit = async () => {
+    try {
+      // Validate form fields
+      const formData = await form.validateFields(['startSem1', 'startSem2', 'end']);
+      console.log(formData);
+      // Send POST request
+      const res = await axios.post('http://14.248.97.203:4869/api/v1/school/creat-school-year', formData);
+      console.log('Data submitted:', res.data);
+      setIsModalOpen(false);
+      // Refresh school years data after successful submission
+      fetchData();
+      // Display success message to the user
+      message.success('Data submitted successfully!');
+    } catch (error: any) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        console.error('Server Error:', error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('Network Error:', error.request);
+      } else {
+        // Something else happened while setting up the request
+        console.error('Error:', error.message);
+      }
+      // Display error message to the user
+      message.error('Failed to submit data. Please try again later.');
+    }
   };
 
 
