@@ -1,10 +1,15 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "src/**/*.ts", // Include all TypeScript files in the 'src' directory and its subdirectories
+    "vite.config.ts", // Include the vite.config.ts file
+    "src/pages/Teaching/**/*"
+  ]
 }

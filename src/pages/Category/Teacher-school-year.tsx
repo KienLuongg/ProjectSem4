@@ -1,29 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Button, Col, Row, Form, Table, Modal, message, Select } from 'antd';
-import axios from 'axios';
-
-interface SchoolYearTeacherData {
-    id: number;
-    teacherId: string;
-    schoolYearId: string;
-}
-
-interface SchoolYear {
-    id: string;
-    name: string;
-}
-
-interface Teacher {
-    id: string;
-    lastname: string;
-}
+import teacherApi from '../../apis/urlApi';
+import { SchoolYearTeacherData, SchoolYearsData, TeacherData } from '../../types/response';
+import mainAxios from '../../apis/main-axios';
 
 export default function SchoolYearTeacher() {
     const [schoolYearTeachers, setSchoolYearTeachers] = useState<SchoolYearTeacherData[]>([]);
-    const [teachers, setTeachers] = useState<Teacher[]>([]);
+    const [teachers, setTeachers] = useState<TeacherData[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
-    const [schoolYears, setSchoolYears] = useState<SchoolYear[]>([]);
+    const [schoolYears, setSchoolYears] = useState<SchoolYearsData[]>([]);
 
     useEffect(() => {
         fetchData();
@@ -32,7 +18,7 @@ export default function SchoolYearTeacher() {
     }, []);
 
     const fetchData = () => {
-        axios.get('http://14.248.97.203:4869/api/v1/school/teacher-school-year')
+        teacherApi.getTeacherSchoolYear()
             .then(response => {
                 setSchoolYearTeachers(response.data);
             })
@@ -42,7 +28,7 @@ export default function SchoolYearTeacher() {
     };
 
     const fetchSchoolYears = () => {
-        axios.get('http://14.248.97.203:4869/api/v1/school/school-year')
+        teacherApi.getSchoolYear()
             .then(response => {
                 setSchoolYears(response.data);
             })
@@ -52,7 +38,7 @@ export default function SchoolYearTeacher() {
     };
 
     const fetchTeachers = () => {
-        axios.get('http://14.248.97.203:4869/api/v1/school/teacher')
+        mainAxios.get('/api/v1/teacher')
             .then(response => {
                 setTeachers(response.data);
             })
@@ -71,8 +57,8 @@ export default function SchoolYearTeacher() {
 
     const handleSubmit = async () => {
         try {
-            const formData = await form.validateFields(['teacherId', 'schoolYearId']);
-            const res = await axios.post('http://14.248.97.203:4869/api/v1/school/creat-teacher-school-year', formData);
+            const formData = await form.validateFields();
+            const res = await teacherApi.postCreateTeacherSchoolYear(formData);
             console.log('Data submitted:', res.data);
             setIsModalOpen(false);
             fetchData();
@@ -140,8 +126,8 @@ export default function SchoolYearTeacher() {
                             >
                                 <Select>
                                     {schoolYears.map(schoolYear => (
-                                        <Select.Option key={schoolYear.id} value={schoolYear.id.toString()}>
-                                            {schoolYear.name}
+                                        <Select.Option key={schoolYear.id} value={schoolYear.id}>
+                                            {schoolYear.id}
                                         </Select.Option>
                                     ))}
                                 </Select>
@@ -150,14 +136,24 @@ export default function SchoolYearTeacher() {
                     </Modal>
                 </Col>
             </Row>
-            <Table dataSource={schoolYearTeachers} rowKey="id">
+            <Table dataSource={schoolYearTeachers} rowKey="id" className=' text-black dark:text-white'>
                 <Table.Column title="Id" dataIndex="id" />
-                <Table.Column title="Giáo viên" dataIndex="teacherId"
+                <Table.Column
+                    title="Giáo viên"
+                    dataIndex="teacherId"
                     render={(teacherId: string) => {
                         const teacher = teachers.find(teacher => teacher.id === teacherId);
                         return teacher ? teacher.lastname : 'Unknown';
-                    }} />
-                <Table.Column title="Năm học" dataIndex="schoolYearId" />
+                    }}
+                />
+                <Table.Column
+                    title="Năm học"
+                    dataIndex="schoolYearId"
+                    render={(schoolYearId: number) => {
+                        const schoolYear = schoolYears.find(year => year.id === schoolYearId);
+                        return schoolYear ? schoolYear.id : 'Unknown';
+                    }}
+                />
             </Table>
         </div>
     );

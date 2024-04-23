@@ -1,26 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Button, Col, Row, Form, Table, Modal, message, Select } from 'antd';
-import axios from 'axios';
-
-interface SchoolYearSubjectData {
-    id: number;
-    schoolYearId: string;
-    subjectIds: string[];
-}
-
-interface Subject {
-    id: number;
-    name: string;
-}
-
-interface SchoolYear {
-    id: string;
-    name: string;
-}
+import teacherApi from '../../apis/urlApi';
+import { SchoolYearSubjectData, SchoolYearsData, Subjects } from '../../types/response';
 
 export default function SchoolYearSubject() {
-    const [subjects, setSubjects] = useState<Subject[]>([]);
-    const [schoolYears, setSchoolYears] = useState<SchoolYear[]>([]);
+    const [subjects, setSubjects] = useState<Subjects[]>([]);
+    const [schoolYears, setSchoolYears] = useState<SchoolYearsData[]>([]);
     const [SchoolYearSubject, setSchoolYearSubject] = useState<SchoolYearSubjectData[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
@@ -33,7 +18,7 @@ export default function SchoolYearSubject() {
 
     const fetchSubjects = () => {
         // Fetch subjects from API and set the state
-        axios.get('http://14.248.97.203:4869/api/v1/school/subject')
+        teacherApi.getSubjectById()
             .then(response => {
                 setSubjects(response.data);
             })
@@ -44,7 +29,7 @@ export default function SchoolYearSubject() {
 
     const fetchSchoolYears = () => {
         // Fetch school years from API and set the state
-        axios.get('http://14.248.97.203:4869/api/v1/school/school-year')
+        teacherApi.getSchoolYear()
             .then(response => {
                 setSchoolYears(response.data);
             })
@@ -54,7 +39,7 @@ export default function SchoolYearSubject() {
     };
 
     const fetchData = () => {
-        axios.get('http://14.248.97.203:4869/api/v1/school/school-year-subject')
+        teacherApi.getSchoolYearSubject()
             .then(response => {
                 setSchoolYearSubject(response.data);
             })
@@ -64,14 +49,15 @@ export default function SchoolYearSubject() {
     };
 
     // Function to get school year name by ID
-    const getSchoolYearNameById = (schoolYearId: string): string => {
+    const getSchoolYearNameById = (schoolYearId: number): Date | null => {
         const foundSchoolYear = schoolYears.find(schoolYear => schoolYear.id === schoolYearId);
-        return foundSchoolYear ? foundSchoolYear.name : '';
+        return foundSchoolYear ? foundSchoolYear.startSem1 : null;
     };
 
+
     // Function to get subject name by ID
-    const getSubjectNameById = (subjectId: string): string => {
-        const foundSubject = subjects.find(subject => subject.id === parseInt(subjectId));
+    const getSubjectNameById = (subjectId: number): string => {
+        const foundSubject = subjects.find(subject => subject.id === subjectId);
         return foundSubject ? foundSubject.name : '';
     };
 
@@ -86,10 +72,10 @@ export default function SchoolYearSubject() {
     const handleSubmit = async () => {
         try {
             // Validate form fields
-            const formData = await form.validateFields(['subjectId', 'schoolYearId']);
+            const formData = await form.validateFields();
             console.log(formData);
             // Send POST request
-            const res = await axios.post('http://14.248.97.203:4869/api/v1/school/creat-school-year_subject', formData);
+            const res = await teacherApi.postCreateSchoolYearSubject(formData);
             console.log('Data submitted:', res.data);
             setIsModalOpen(false);
             // Refresh school years data after successful submission
@@ -169,7 +155,7 @@ export default function SchoolYearSubject() {
                                 <Select>
                                     {schoolYears.map(schoolYear => (
                                         <Select.Option key={schoolYear.id} value={schoolYear.id.toString()}>
-                                            {schoolYear.name}
+                                            {schoolYear.id} {/* Render the ID of the school year */}
                                         </Select.Option>
                                     ))}
                                 </Select>
@@ -178,11 +164,32 @@ export default function SchoolYearSubject() {
                     </Modal>
                 </Col>
             </Row>
-            <Table dataSource={SchoolYearSubject} rowKey="id">
+            <Table dataSource={SchoolYearSubject} rowKey="id" className=' text-black dark:text-white'>
                 <Table.Column title="Id" dataIndex="id" />
-                <Table.Column title="Năm học" dataIndex="schoolYearId" render={(schoolYearId: string) => getSchoolYearNameById(schoolYearId)} />
-                <Table.Column title="Môn học" dataIndex="subjectIds" render={(subjectIds: string[]) => subjectIds.map(subjectId => getSubjectNameById(subjectId)).join(', ')} />
+                <Table.Column
+                    title="Năm học"
+                    dataIndex="schoolYearId"
+                    render={(schoolYearId: number) => {
+                        const schoolYearName = getSchoolYearNameById(schoolYearId);
+                        return schoolYearName ? schoolYearName.toString() : ''; // Convert Date to string and handle null case
+                    }}
+                />
+                <Table.Column
+                    title="Môn học"
+                    dataIndex="subjectIds"
+                    render={(subjectIds: number[]) => {
+                        const subjectNames = subjectIds.map(subjectId => {
+                            if (subjectId === 0) {
+                                return 'Unknown'; // Handle the case where subjectId is 0
+                            } else {
+                                return getSubjectNameById(subjectId);
+                            }
+                        });
+                        return subjectNames.join(', ');
+                    }}
+                />
             </Table>
+
         </div>
     );
 

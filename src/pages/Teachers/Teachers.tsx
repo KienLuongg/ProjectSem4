@@ -1,10 +1,9 @@
-import { Link } from 'react-router-dom';
 import { Button, Col, Form, Input, Row, Select, Table, Modal, DatePicker, Radio, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
-import axios from 'axios';
+import teacherApi from '../../apis/urlApi';
+import { TeacherData } from '../../types/response';
 
 const options = [
     { value: '1A1', label: '1A1' },
@@ -12,20 +11,7 @@ const options = [
     { value: '1A3', label: '1A3' },
 ];
 
-interface TeacherData {
-    id: string;
-    officerNumber: string;
-    firstname: string;
-    lastname: string;
-    gender: string;
-    address: string;
-    phone: string;
-    birthday: string;
-    joiningDate: string;
-    department: string;
-    positionId: string;
-    active: string;
-}
+
 
 export default function Teachers() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,7 +21,7 @@ export default function Teachers() {
 
     useEffect(() => {
         // Fetch data for the table on component mount
-        axios.get('http://14.248.97.203:4869/api/v1/teacher/teachers')
+        teacherApi.getTeacher()
             .then(response => {
                 // Update state with fetched data
                 setTeachers(response.data);
@@ -58,7 +44,7 @@ export default function Teachers() {
 
     const handleSubmit = (formData: any) => {
         // Make POST request to submit form data
-        axios.post('http://14.248.97.203:4869/api/v1/teacher/add-teacher', formData)
+        teacherApi.postTeacher(formData)
             .then(response => {
                 // Handle successful submission
                 console.log('Data submitted:', response.data);
@@ -361,6 +347,7 @@ export default function Teachers() {
                 <Table.Column title="Vị trí" dataIndex="positionId" />
                 <Table.Column title="Ngày gia nhập" dataIndex="joiningDate" />
             </Table>
+
         </div>
     );
 }

@@ -1,33 +1,61 @@
 import { useEffect, useState } from 'react';
 import { Button, Col, Row, Form, Table, Modal, message, Select, Input } from 'antd';
-import axios from 'axios';
+import teacherApi from '../../apis/urlApi';
+import { GradeData, RoomData, SchoolYearClassData, SchoolYearTeacherData, SchoolYearsData } from '../../types/response';
 
-interface SchoolYearClassData {
-    id: number;
-    gradeId: string;
-    schoolYearId: string;
-    teacherSchoolYearId: string;
-    roomId: string;
-    className: string;
-    classCode: string;
-}
 
 export default function SchoolYearClass() {
     const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
+    const [grades, setGrades] = useState<GradeData[]>([]);
+    const [rooms, setRooms] = useState<RoomData[]>([]);
+    const [teacherSchoolYears, setTeacherSchoolYears] = useState<SchoolYearTeacherData[]>([]);
 
     useEffect(() => {
         fetchData();
+        fetchGrades();
+        fetchRooms();
+        fetchTeacherSchoolYears();
     }, []);
 
     const fetchData = () => {
-        axios.get('http://14.248.97.203:4869/api/v1/school/school-year-class')
+        teacherApi.getSchoolYearClass()
             .then(response => {
                 setSchoolYearClass(response.data);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
+            });
+    };
+
+    const fetchGrades = () => {
+        teacherApi.getGrades()
+            .then(response => {
+                setGrades(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching grades:', error);
+            });
+    };
+
+    const fetchRooms = () => {
+        teacherApi.getRooms()
+            .then(response => {
+                setRooms(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching rooms:', error);
+            });
+    };
+
+    const fetchTeacherSchoolYears = () => {
+        teacherApi.getTeacherSchoolYear()
+            .then(response => {
+                setTeacherSchoolYears(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching teacher school years:', error);
             });
     };
 
@@ -41,8 +69,8 @@ export default function SchoolYearClass() {
 
     const handleSubmit = async () => {
         try {
-            const formData = await form.validateFields(['teacherId', 'schoolYearId']);
-            const res = await axios.post('http://14.248.97.203:4869/api/v1/school/creat-school-year-class', formData);
+            const formData = await form.validateFields();
+            const res = await teacherApi.postCreateSchoolYearClass(formData);
             console.log('Data submitted:', res.data);
             setIsModalOpen(false);
             fetchData();
@@ -111,42 +139,58 @@ export default function SchoolYearClass() {
                                 name="gradeId"
                                 rules={[{ required: true, message: 'Vui lòng chọn khối học!' }]}
                             >
-                                <Select />
+                                <Select>
+                                    {grades.map((grade: any) => (
+                                        <Select.Option key={grade.id} value={grade.id}>
+                                            {grade.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
                             <Form.Item
                                 label="Phòng học"
                                 name="roomId"
                                 rules={[{ required: true, message: 'Vui lòng chọn phòng học!' }]}
                             >
-                                <Select />
+                                <Select>
+                                    {rooms.map((room: any) => (
+                                        <Select.Option key={room.id} value={room.id}>
+                                            {room.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
-                            <Form.Item
+                            {/* <Form.Item
                                 label="Giáo viên"
                                 name="teacherSchoolYearId"
                                 rules={[{ required: true, message: 'Vui lòng chọn giáo viên!' }]}
                             >
-                                <Select />
-                            </Form.Item>
-                            <Form.Item
-                                label="Năm học"
-                                name="schoolYearId"
-                                rules={[{ required: true, message: 'Vui lòng chọn năm học!' }]}
-                            >
-                                <Select />
-                            </Form.Item>
+                                <Select>
+                                    {teacherSchoolYears.map((teacher: any) => (
+                                        <Select.Option key={teacher.id} value={teacher.id}>
+                                            {teacher.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item> */}
                         </Form>
                     </Modal>
                 </Col>
             </Row>
-            <Table dataSource={schoolYearClass} rowKey="id">
-                <Table.Column title="ID" dataIndex="id" />
-                <Table.Column title="Tên lớp" dataIndex="className" />
-                <Table.Column title="Mã lớp" dataIndex="classCode" />
-                <Table.Column title="Khối học" dataIndex="gradeId" />
-                <Table.Column title="Phòng học" dataIndex="roomId" />
-                <Table.Column title="Giáo viên" dataIndex="teacherSchoolYearId" />
-                <Table.Column title="Năm học" dataIndex="schoolYearId" />
-            </Table>
+            <div>
+                <Row justify="space-between" style={{ marginBottom: '15px' }}>
+
+                </Row>
+
+                <Table dataSource={schoolYearClass} rowKey="id" className=' text-black dark:text-white'>
+                    <Table.Column title="ID" dataIndex="id" />
+                    <Table.Column title="Tên lớp" dataIndex="className" />
+                    <Table.Column title="Mã lớp" dataIndex="classCode" />
+                    <Table.Column title="Khối học" dataIndex="gradeId" />
+                    <Table.Column title="Phòng học" dataIndex="roomId" />
+                    <Table.Column title="Năm học" dataIndex="schoolYearId" />
+                </Table>
+            </div>
         </div>
     );
 }

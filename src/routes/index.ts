@@ -10,13 +10,14 @@ const SchoolYearTeacher = lazy(() => import('../pages/Category/Teacher-school-ye
 const SubjectProgram = lazy(() => import('../pages/Category/Subject-program'));
 const SchoolYearClass = lazy(() => import('../pages/Category/School-year-class'));
 const Profile = lazy(() => import('../pages/Profile'));
+const Schedule = lazy(() => import('../pages/Teaching/Schedules'))
 
 
 const coreRoutes = [
   {
     path: '*',
     title: 'NotFound',
-    component: NotFound,
+    component: NotFound, å
   },
   {
     path: '/students',
@@ -62,6 +63,11 @@ const coreRoutes = [
     path: '/profile',
     title: 'Profile',
     component: Profile,
+  },
+  {
+    path: '/Schedule',
+    title: 'Schedule',
+    component: Schedule,
   },
 ];
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button, Col, Row, Form, Table, Modal, message, Select, Input } from 'antd';
 import axios from 'axios';
+import mainAxios from '../../apis/main-axios';
 
 interface ProgramData {
     id: number;
@@ -34,10 +35,9 @@ export default function SchoolProgram() {
     }, []);
 
     const fetchData = () => {
-        axios.get('http://14.248.97.203:4869/api/v1/school/school-year-subject-grade')
-            .then(response => {
-                setSchoolProgram(response.data);
-            })
+        mainAxios.get('').then(response => {
+            setSchoolProgram(response.data);
+        })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
@@ -170,7 +170,7 @@ export default function SchoolProgram() {
                     </Modal>
                 </Col>
             </Row>
-            <Table dataSource={schoolProgram} rowKey="id">
+            <Table dataSource={schoolProgram} rowKey="id" className=' text-black dark:text-white'>
                 <Table.Column title="Id" dataIndex="id" />
                 <Table.Column title="Môn học" dataIndex="schoolYearSubjectId" />
                 {/* <Table.Column title="Khối" dataIndex="gradeId" /> */}
