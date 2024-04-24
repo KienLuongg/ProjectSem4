@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Row, Form, Table, Modal, message, Select } from 'antd';
 import teacherApi from '../../apis/urlApi';
 import { SchoolYearTeacherData, SchoolYearsData, TeacherData } from '../../types/response';
-import mainAxios from '../../apis/main-axios';
 
 export default function SchoolYearTeacher() {
     const [schoolYearTeachers, setSchoolYearTeachers] = useState<SchoolYearTeacherData[]>([]);
@@ -38,7 +37,7 @@ export default function SchoolYearTeacher() {
     };
 
     const fetchTeachers = () => {
-        mainAxios.get('/api/v1/teacher')
+        teacherApi.getTeacher()
             .then(response => {
                 setTeachers(response.data);
             })
@@ -76,11 +75,11 @@ export default function SchoolYearTeacher() {
     };
 
     return (
-        <div>
-            <Row style={{ marginBottom: '15px' }}>
+        <div className="p-4">
+            <Row className="mb-4">
                 <Col span={12}></Col>
-                <Col span={12} style={{ textAlign: 'right' }}>
-                    <Button type="default" onClick={showModal} style={{ marginLeft: '' }}>
+                <Col span={12} className="text-right">
+                    <Button type="default" onClick={showModal} className="">
                         Thêm
                     </Button>
                     <Modal
@@ -89,10 +88,10 @@ export default function SchoolYearTeacher() {
                         onCancel={handleCancel}
                         footer={[
                             <Button key="back" onClick={handleCancel}>
-                                Cancel
+                                Hủy
                             </Button>,
                             <Button key="submit" type="primary" onClick={handleSubmit}>
-                                Submit
+                                Gửi
                             </Button>,
                         ]}
                     >
@@ -112,11 +111,7 @@ export default function SchoolYearTeacher() {
                                 rules={[{ required: true, message: 'Please select a teacher!' }]}
                             >
                                 <Select>
-                                    {teachers.map(teacher => (
-                                        <Select.Option key={teacher.id} value={teacher.id}>
-                                            {teacher.lastname}
-                                        </Select.Option>
-                                    ))}
+
                                 </Select>
                             </Form.Item>
                             <Form.Item
@@ -136,24 +131,10 @@ export default function SchoolYearTeacher() {
                     </Modal>
                 </Col>
             </Row>
-            <Table dataSource={schoolYearTeachers} rowKey="id" className=' text-black dark:text-white'>
-                <Table.Column title="Id" dataIndex="id" />
-                <Table.Column
-                    title="Giáo viên"
-                    dataIndex="teacherId"
-                    render={(teacherId: string) => {
-                        const teacher = teachers.find(teacher => teacher.id === teacherId);
-                        return teacher ? teacher.lastname : 'Unknown';
-                    }}
-                />
-                <Table.Column
-                    title="Năm học"
-                    dataIndex="schoolYearId"
-                    render={(schoolYearId: number) => {
-                        const schoolYear = schoolYears.find(year => year.id === schoolYearId);
-                        return schoolYear ? schoolYear.id : 'Unknown';
-                    }}
-                />
+            <Table dataSource={schoolYearTeachers} rowKey="id" className="text-black dark:text-white">
+                <Table.Column title="Id" dataIndex="id" className='w-1/12' />
+                <Table.Column title='Giáo viên' filterDropdown />
+                <Table.Column title='Chủ nhiệm' filterDropdown />
             </Table>
         </div>
     );
