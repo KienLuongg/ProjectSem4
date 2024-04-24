@@ -13,52 +13,52 @@ export default function SchoolYearClass() {
     const [teacherSchoolYears, setTeacherSchoolYears] = useState<SchoolYearTeacherData[]>([]);
 
 
-    // useEffect(() => {
-    //     fetchData();
-    //     fetchGrades();
-    //     fetchRooms();
-    //     fetchTeacherSchoolYears();
-    // }, []);
+    useEffect(() => {
+        fetchData();
+        fetchGrades();
+        fetchRooms();
+        fetchTeacherSchoolYears();
+    }, []);
 
-    // const fetchData = () => {
-    //     teacherApi.getSchoolYearClass()
-    //         .then(response => {
-    //             setSchoolYearClass(response.data);
-    //         })
-    //         .catch(error => {
-    //             console.error('Error fetching data:', error);
-    //         });
-    // };
+    const fetchData = () => {
+        teacherApi.getSchoolYearClass()
+            .then(response => {
+                setSchoolYearClass(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    };
 
-    // const fetchGrades = () => {
-    //     teacherApi.getGrades()
-    //         .then(response => {
-    //             setGrades(response.data);
-    //         })
-    //         .catch(error => {
-    //             console.error('Error fetching grades:', error);
-    //         });
-    // };
+    const fetchGrades = () => {
+        teacherApi.getGrades()
+            .then(response => {
+                setGrades(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching grades:', error);
+            });
+    };
 
-    // const fetchRooms = () => {
-    //     teacherApi.getRooms()
-    //         .then(response => {
-    //             setRooms(response.data);
-    //         })
-    //         .catch(error => {
-    //             console.error('Error fetching rooms:', error);
-    //         });
-    // };
+    const fetchRooms = () => {
+        teacherApi.getRooms()
+            .then(response => {
+                setRooms(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching rooms:', error);
+            });
+    };
 
-    // const fetchTeacherSchoolYears = () => {
-    //     teacherApi.getTeacherSchoolYear()
-    //         .then(response => {
-    //             setTeacherSchoolYears(response.data);
-    //         })
-    //         .catch(error => {
-    //             console.error('Error fetching teacher school years:', error);
-    //         });
-    // };
+    const fetchTeacherSchoolYears = () => {
+        teacherApi.getTeacherSchoolYear()
+            .then(response => {
+                setTeacherSchoolYears(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching teacher school years:', error);
+            });
+    };
 
     const showModal = () => {
         setIsModalOpen(true);

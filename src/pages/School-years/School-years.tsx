@@ -10,7 +10,7 @@ export default function SchoolYears() {
   const [schoolYears, setSchoolYears] = useState<SchoolYearsData[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
