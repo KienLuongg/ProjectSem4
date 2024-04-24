@@ -1,52 +1,64 @@
-import { Link } from 'react-router-dom';
-import { Button, Col, Form, Input, Row, Select, Table, Modal, DatePicker, Radio, Upload } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Table, Modal, DatePicker, Radio, Upload, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import Column from 'antd/es/table/Column';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
-import axios from 'axios';
-
+import mainAxios from '../../apis/main-axios';
+import { TeacherData } from '../../types/response'
 const options = [
     { value: '1A1', label: '1A1' },
     { value: '1A2', label: '1A2' },
     { value: '1A3', label: '1A3' },
 ];
 
-interface TeacherData {
-    id: string;
-    officerNumber: string;
-    firstname: string;
-    lastname: string;
-    gender: string;
-    address: string;
-    phone: string;
-    birthday: string;
-    joiningDate: string;
-    department: string;
-    positionId: string;
-    active: string;
+interface Role {
+    id: number,
+    name: string
 }
 
-export default function Teachers() {
+interface ErrRes {
+    timestamp: string
+    statusCode: number
+    message: string
+    path: string
+    error: string
+}
+export default function Teachers({ onAdd }: any) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [form] = Form.useForm();
     const [teachers, setTeachers] = useState<TeacherData[]>([]);
-
+    const [roles, setRoles] = useState<Role[]>([]); // Renamed `role` to `roles`
 
     useEffect(() => {
-        // Fetch data for the table on component mount
-        axios.get('http://14.248.97.203:4869/api/v1/teacher/teachers')
+        // Fetch teacher
+        fetTeacher();
+        // Fetch roles
+        fetchRoles();
+    }, []);
+
+
+    const fetchRoles = async () => {
+        try {
+            const r = await mainAxios.get('/api/v1/school/get-roles');
+            setRoles(r.data.body)
+        } catch (error) {
+            console.table(error)
+            // Fetch data for the table on component mount
+        }
+
+    };
+    const fetTeacher = async () => {
+        mainAxios.get('/api/v1/teacher')
             .then(response => {
                 // Update state with fetched data
                 setTeachers(response.data);
-                console.log("Fetched teachers:", response.data); // Log fetched students
+                console.log("Fetched teachers:", response.data); // Log fetched teachers
             })
             .catch(error => {
                 // Handle error
-                console.error('Error fetching data:', error);
+                console.error('Error fetching teachers:', error);
             });
-    }, []);
 
+    }
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -56,22 +68,32 @@ export default function Teachers() {
         setIsModalOpen(false);
     };
 
-    const handleSubmit = (formData: any) => {
-        // Make POST request to submit form data
-        axios.post('http://14.248.97.203:4869/api/v1/teacher/add-teacher', formData)
+    const handleSubmit = async () => {
+        const values = await form.validateFields();
+        console.log(values)
+        // values['role'] = [1];
+        values['gender'] = values['gender'] === "true";
+        // Call postCreateSchoolYear function from teacherApi
+        await mainAxios.post('/api/v1/teacher', values)
             .then(response => {
-                // Handle successful submission
-                console.log('Data submitted:', response.data);
-                // Close modal
                 setIsModalOpen(false);
-                // Optionally, you can fetch updated data for the table here
-            })
-            .catch(error => {
-                // Handle error
-                console.error('Error submitting data:', error);
-            });
-    };
+                message.success("thêm giáo viên thành công")
+                fetTeacher()
+            }).catch((err) => {
+                var error = err.response.data as ErrRes;
+                console.log(error)
+                message.error(error.message);
 
+            })
+
+    }
+    const handleChange = (value: string) => {
+        console.log(`selected ${value}`);
+    };
+    const role = roles.map(r => ({
+        value: r.id,
+        label: r.name
+    }));
     return (
         <div>
             <Breadcrumb pageName='Classes' />
@@ -206,8 +228,35 @@ export default function Teachers() {
                                         wrapperCol={{ flex: 1 }}
                                         colon={false}
                                         style={{ maxWidth: 650 }}
+                                        form={form}
                                     >
                                         <Row gutter={[16, 0]}>
+                                            <Col span={12}>
+                                                <Form.Item
+                                                    label="Tên tài khoản:"
+                                                    name="username"
+                                                    rules={[{ required: true, message: 'Please input!' }]}
+                                                >
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={12}>
+                                                <Form.Item
+                                                    label="Mật khẩu:"
+                                                    name="password"
+                                                    rules={[{ required: true, message: 'Please input!' }]}
+                                                >
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={12}>
+                                                <Form.Item
+                                                    label="Role:"
+                                                    name="role"
+                                                >
+                                                    <Select mode="tags" style={{ width: '100%' }} placeholder="Nhập nhận xét" onChange={handleChange} options={role} />
+                                                </Form.Item>
+                                            </Col>
                                             <Col span={12}>
                                                 <Form.Item
                                                     label="Họ:"
@@ -230,7 +279,7 @@ export default function Teachers() {
                                             <Col span={12}>
                                                 <Form.Item
                                                     label="Ngày sinh:"
-                                                    name="Dob"
+                                                    name="birthday"
                                                     rules={[{ required: true, message: 'Please input!' }]}
                                                 >
                                                     <DatePicker />
@@ -243,8 +292,8 @@ export default function Teachers() {
                                                     rules={[{ required: true, message: 'Please select!' }]}
                                                 >
                                                     <Radio.Group>
-                                                        <Radio value="male">Nam</Radio>
-                                                        <Radio value="female">Nữ</Radio>
+                                                        <Radio value="false">Nam</Radio>
+                                                        <Radio value="true">Nữ</Radio>
                                                     </Radio.Group>
                                                 </Form.Item></Col>
 
@@ -254,7 +303,7 @@ export default function Teachers() {
                                             <Col span={12}>
                                                 <Form.Item
                                                     label="Số CCCD:"
-                                                    name="citizen-id"
+                                                    name="citizen_id"
                                                     rules={[
                                                         { required: true, message: 'Please input!' },
                                                         { pattern: /^[0-9]+$/, message: 'Please enter a valid number!' },
@@ -312,11 +361,12 @@ export default function Teachers() {
                                                 </Form.Item></Col>
                                             <Col span={12}>
                                                 <Form.Item
-                                                    label="Dạy môn:"
-                                                    name="positionId"
+                                                    label="Biệt danh"
+                                                    name="sortName"
                                                     rules={[{ required: true, message: 'Please input!' }]}
                                                 >
-                                                    <Select options={options} defaultValue={options[0].value} style={{ width: '80%' }} />
+                                                    <Input />
+
                                                 </Form.Item></Col>
                                             <Col span={12}>
                                                 <Form.Item
@@ -351,15 +401,27 @@ export default function Teachers() {
                 <Table.Column
                     title="Họ và tên"
                     render={(text, record: TeacherData) =>
-                        `${record.firstname} ${record.lastname}`
+                        `${record.user.userDetail.firstname} ${record.user.userDetail.firstname}`
                     }
                 />
-                <Table.Column title="Ngày sinh" dataIndex="birthday" />
-                <Table.Column title="Giới tính" dataIndex="gender" />
-                <Table.Column title="Địa chỉ" dataIndex="address" />
-                <Table.Column title="Trạng thái" dataIndex="status" />
-                <Table.Column title="Vị trí" dataIndex="positionId" />
-                <Table.Column title="Ngày gia nhập" dataIndex="joiningDate" />
+                <Table.Column title="Ngày sinh" render={(text, record: TeacherData) =>
+                    `${record.user.userDetail.birthday}`
+                } />
+                <Table.Column title="Giới tính" render={(text, record: TeacherData) =>
+                    `${record.user.userDetail.gender === "true" ? "famale" : "male"}`
+                } />
+                <Table.Column title="Địa chỉ" render={(text, record: TeacherData) =>
+                    `${record.user.userDetail.address}`
+                } />
+
+                <Table.Column title="Vị trí" render={(text, record: TeacherData) =>
+                    `${record.user.roles.map(r => {
+                        return r.name
+                    })}`
+                } />
+                <Table.Column title="Ngày gia nhập" render={(text, record: TeacherData) =>
+                    `${record.joiningDate}`
+                } />
             </Table>
         </div>
     );

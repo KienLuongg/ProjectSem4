@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { getCookie, setCookie } from '../utils/storage/cookie-storage';
 import { Storage } from '../contstants/storage';
-import { deleteLocalData } from '../utils/local-data-handler';
 
-const baseURL = 'http://14.248.97.203:4869';
+const baseURL = 'http://113.178.35.92:4869';
 
 const mainAxios = axios.create({
   baseURL,
@@ -12,83 +11,61 @@ const mainAxios = axios.create({
   },
 });
 
-// const handleRefreshToken = async (
-//   refreshToken: string,
-//   isRequest: boolean,
-//   originalConfig?: any
-// ) => {
-//   if (refreshToken && !isRefreshing) {
-//     isRefreshing = true;
+mainAxios.interceptors.request.use(
+  (config) => {
+    const token = getCookie(Storage.token);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-//     try {
-//       const response = await axios.post(
-//         `${process.env.NEXT_PUBLIC_BASE_API_URL}/api/general/auth/refresh-token`,
-//         { refreshToken }
-//       );
-
-//       const newToken = response?.data?.data?.accessToken;
-//       const newRefreshToken = response?.data?.data?.refreshToken;
-
-//       if (!newToken) {
-//         deleteLocalData();
-//       }
-
-//       setCookie(Storage.token, newToken);
-//       setCookie(Storage.refresh_token, newRefreshToken);
-
-//       onTokenRefreshed(newToken);
-
-//       if (isRequest) {
-//         const config = {
-//           ...originalConfig,
-//           headers: {
-//             ...originalConfig.headers,
-//             Authorization: `Bearer ${response.data.data.accessToken}`,
-//           },
-//         };
-
-//         return mainAxios(config);
-//       }
-//     } catch (error) {
-//       deleteLocalData();
-//       return Promise.reject(error);
-//     } finally {
-//       isRefreshing = false;
-//     }
-//   }
-// };
-// nterceptor Phản Hồi để xử lý token hết hạn
+// Thêm interceptor để xử lý refresh token
 mainAxios.interceptors.response.use(
   (response) => {
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
+
+    // Nếu phản hồi lỗi là 401 Unauthorized và không phải là yêu cầu refresh token đầu tiên
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const refreshToken = getCookie(Storage.refresh_token);
-      try {
-        const response = await mainAxios.post('/api/v1/auth/refresh-token', {
-          refresh_token: refreshToken,
-        });
-        if (response.status === 200) {
-          setCookie(Storage.token, response.data.token);
-          setCookie(Storage.refresh_token, response.data.refresh_token);
 
-          // Cập nhật header trong originalRequest
-          originalRequest.headers['Authorization'] =
-            `Bearer ${response.data.token}`;
-          // Gửi lại yêu cầu với token mới
-          return mainAxios(originalRequest);
-        }
+      try {
+        // Gửi yêu cầu refresh token
+        const refreshToken = getCookie(Storage.refresh_token);
+        const refreshResponse = await mainAxios.post(
+          '/api/v1/auth/refresh-token',
+          { refresh_token: refreshToken }
+        );
+
+        // Cập nhật token mới và refresh token trong cookie
+        setCookie(Storage.token, refreshResponse.data.token);
+        setCookie(Storage.refresh_token, refreshResponse.data.refresh_token);
+
+        // Thực hiện lại yêu cầu gốc với token mới
+        originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.token}`;
+        return axios(originalRequest);
       } catch (refreshError) {
-        console.log('Refresh token error:', refreshError);
-        return Promise.reject(refreshError);
+        // Xử lý lỗi khi không thể refresh token (ví dụ: token hết hạn)
+        console.error('Could not refresh token:', refreshError);
+        // Đăng xuất người dùng hoặc xử lý lỗi một cách phù hợp
+        // Ví dụ: dispatch một hành động để đăng xuất người dùng
+        // logoutUser();
+        throw refreshError;
       }
     }
 
     return Promise.reject(error);
   }
+
+
+
 );
 
 export default mainAxios;
