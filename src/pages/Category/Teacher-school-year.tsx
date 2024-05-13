@@ -111,20 +111,6 @@ export default function SchoolYearTeacher() {
                                 rules={[{ required: true, message: 'Please select a teacher!' }]}
                             >
                                 <Select>
-
-                                </Select>
-                            </Form.Item>
-                            <Form.Item
-                                label="Năm học"
-                                name="schoolYearId"
-                                rules={[{ required: true, message: 'Please select a school year!' }]}
-                            >
-                                <Select>
-                                    {schoolYears.map(schoolYear => (
-                                        <Select.Option key={schoolYear.id} value={schoolYear.id}>
-                                            {schoolYear.id}
-                                        </Select.Option>
-                                    ))}
                                 </Select>
                             </Form.Item>
                         </Form>

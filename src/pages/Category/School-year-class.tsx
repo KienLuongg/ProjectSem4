@@ -24,6 +24,7 @@ export default function SchoolYearClass() {
         teacherApi.getSchoolYearClass()
             .then(response => {
                 setSchoolYearClass(response.data);
+
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -33,27 +34,31 @@ export default function SchoolYearClass() {
     const fetchGrades = () => {
         teacherApi.getGrades()
             .then(response => {
-                setGrades(response.data);
+                setGrades(response.data.body);
+
             })
             .catch(error => {
                 console.error('Error fetching grades:', error);
             });
     };
+    console.log(grades)
 
     const fetchRooms = () => {
         teacherApi.getRooms()
             .then(response => {
-                setRooms(response.data);
+                setRooms(response.data.body);
             })
             .catch(error => {
                 console.error('Error fetching rooms:', error);
             });
     };
 
+
     const fetchTeacherSchoolYears = () => {
         teacherApi.getTeacherSchoolYear()
             .then(response => {
-                setTeacherSchoolYears(response.data);
+                setTeacherSchoolYears(response.data.teacher);
+                console.log(response.data.teacher)
             })
             .catch(error => {
                 console.error('Error fetching teacher school years:', error);
@@ -142,10 +147,11 @@ export default function SchoolYearClass() {
                                 rules={[{ required: true, message: 'Vui lòng chọn khối học!' }]}
                             >
                                 <Select>
-                                    {grades.map((grade: any) => (
+                                    {grades.map(grade => (
                                         <Select.Option key={grade.id} value={grade.id}>
                                             {grade.name}
                                         </Select.Option>
+
                                     ))}
                                 </Select>
                             </Form.Item>
@@ -162,7 +168,7 @@ export default function SchoolYearClass() {
                                     ))}
                                 </Select>
                             </Form.Item>
-                            {/* <Form.Item
+                            <Form.Item
                                 label="Giáo viên"
                                 name="teacherSchoolYearId"
                                 rules={[{ required: true, message: 'Vui lòng chọn giáo viên!' }]}
@@ -170,11 +176,11 @@ export default function SchoolYearClass() {
                                 <Select>
                                     {teacherSchoolYears.map((teacher: any) => (
                                         <Select.Option key={teacher.id} value={teacher.id}>
-                                            {teacher.name}
+                                            {teacher.user.name}
                                         </Select.Option>
                                     ))}
                                 </Select>
-                            </Form.Item> */}
+                            </Form.Item>
                         </Form>
                     </Modal>
                 </Col>
@@ -182,13 +188,22 @@ export default function SchoolYearClass() {
             <div>
                 <Row justify="space-between" className="mb-6">
                     <Table dataSource={schoolYearClass} rowKey="id" className="w-full">
-                        <Table.Column title="STT" dataIndex="id" className="w-1/12" />
-                        <Table.Column title='Tên lớp' dataIndex='className' className='w-1/6' filterDropdown />
-                        <Table.Column title="Thuộc khối" dataIndex="gradeId" className="w-1/6" filterDropdown />
-                        <Table.Column title="Phòng học" dataIndex="roomId" className="w-1/6" filterDropdown />
+                        <Table.Column title="STT" dataIndex="id" className="w-1/6" />
+                        <Table.Column
+                            title="Tên lớp"
+                            dataIndex="name" // Replace with the actual data index for class names
+                            className="w-1/6"
+                            render={(text, record) => (
+                                // Render the input field here
+                                <Input placeholder="Search class name" />
+                            )}
+                        />
+                        <Table.Column title="Thuộc khối" dataIndex="gradeId" className="w-1/6" />
+                        <Table.Column title="Phòng học" dataIndex="roomId" className="w-1/6" />
                     </Table>
                 </Row>
             </div>
+
         </div>
     );
 }

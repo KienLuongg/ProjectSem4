@@ -1,6 +1,6 @@
 import { SearchOutlined } from '@ant-design/icons';
-import type { InputRef } from 'antd';
-import { Breadcrumb, Button, Col, Input, Row, Space, Table } from 'antd';
+import type { InputRef, RadioChangeEvent } from 'antd';
+import { Breadcrumb, Button, Col, Input, Radio, Row, Select, Space, Table } from 'antd';
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import type { FilterConfirmProps } from 'antd/es/table/interface';
 import React, { useRef, useState } from 'react';
@@ -47,7 +47,7 @@ const App: React.FC = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
-    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
 
 
     const handleSearch = (
@@ -64,7 +64,6 @@ const App: React.FC = () => {
         clearFilters();
         setSearchText('');
     };
-
 
     const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<DataType> => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
@@ -143,93 +142,105 @@ const App: React.FC = () => {
             ),
     });
 
-    const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-        console.log('selectedRowKeys changed: ', newSelectedRowKeys);
-        setSelectedRowKeys(newSelectedRowKeys);
-    };
-
-    const rowSelection = {
-        selectedRowKeys,
-        onChange: onSelectChange,
-    };
-
     const columns: ColumnsType<DataType> = [
         {
             title: 'Giáo viên',
             dataIndex: 'name',
             key: 'name',
-            width: '200',
-
+            width: '30%',
             ...getColumnSearchProps('name'),
         },
         {
             title: 'Chủ nhiệm',
             dataIndex: 'assignment',
             key: '',
-            width: '200',
+            width: '20%',
             ...getColumnSearchProps('age'),
         },
         {
             title: 'Phân công giảng dạy',
             dataIndex: 'assignment',
             key: '',
-            width: '200',
+            width: '20%',
             ...getColumnSearchProps('age'),
         },
-
-    ];
-
-    const column1: any = [
         {
-            title: 'Lớp',
-            dataIndex: '',
-            key: '',
-            width: '20px',
-            filters: [
-                {
-                    text: 'London',
-                    value: 'London',
-                },
-                {
-                    text: 'New York',
-                    value: 'New York',
-                },
-            ],
-            onFilter: (value: string, record: { address: string | string[]; }) => record.address.indexOf(value as string) === 0,
+            title: 'Tổng số tiết/tuần',
+            dataIndex: 'address',
+            key: 'address',
+            ...getColumnSearchProps('address'),
         },
     ];
 
-    const column2: any = [
-        {
-            title: ''
-        },
-        {
-            title: 'Môn học',
-            dataIndex: '',
-            key: '',
-            width: '95%',
-        },
-    ];
+    const [value, setValue] = useState(1);
+
+    const onChange = (e: RadioChangeEvent) => {
+        console.log('radio checked', e.target.value);
+        setValue(e.target.value);
+    };
+
+    const onSearch = (value: string) => {
+        console.log('search:', value);
+    };
 
     return <div>
-        <Breadcrumb className="mb-4">
-            <Breadcrumb.Item className="text-3xl text-black">Phân công giảng dạy</Breadcrumb.Item>
-        </Breadcrumb>
-        <Row className='flex justify-end mb-4 pr-5'>
-            <NavLink to="/assignment-list" className='border-2 border-solid rounded-md mr-3 px-4'>Quay lại</NavLink>
-            <Button className='px-8 bg-blue text-white'>Lưu</Button>
-        </Row>
+
         <Row>
-            <Col span={10} className='mr-4 w-1/2'>
-                <Table columns={columns} className="mb-4" />
+            <Col span={6} >
+                <Breadcrumb className="mb-10">
+                    <Breadcrumb.Item className="text-3xl text-black-2">Thống kê</Breadcrumb.Item>
+                </Breadcrumb>
+                <Col span={24} className='mb-10'>
+                    <Select
+                        className='w-full'
+                        showSearch
+                        placeholder="Select"
+                        optionFilterProp="children"
+                        onSearch={onSearch}
+                        options={[
+                            {
+                                value: 'jack',
+                                label: 'Jack',
+                            },
+                            {
+                                value: 'lucy',
+                                label: 'Lucy',
+                            },
+                            {
+                                value: 'tom',
+                                label: 'Tom',
+                            },
+                        ]}
+                    />
+                </Col>
+                <Col span={24} className='mb-10'>
+                    <Radio.Group onChange={onChange} value={value}>
+                        <Space direction="vertical">
+                            <Radio value={1}>Tất cả</Radio>
+                            <Radio value={2}>Đã phân công</Radio>
+                            <Radio value={3}>Chưa phân công</Radio>
+                        </Space>
+                    </Radio.Group>
+                </Col>
+                <Col span={24}>
+                    <div className="mt-auto">
+                        <NavLink to="/assignment" type="default" className="border-2 border-solid rounded-md mb-4 w-full bg-white-500 text-black p-2">
+                            Thực hiện phân công
+                        </NavLink>
+                    </div>
+                </Col>
             </Col>
-            <Col span={4} className='mr-4 w-1/4'>
-                <Table columns={column1} className='mb-4' />
-            </Col>
-            <Col span={9} className='w-1/4'>
-                <Table columns={column2} className='mb-4' rowSelection={rowSelection} />
+            <Col span={1}></Col>
+            <Col span={16}>
+                <Row>
+                    <Col span={24}>
+                        <Table columns={columns} dataSource={data} className="mb-4" />
+                    </Col>
+                </Row>
+
             </Col>
         </Row>
     </div>;
 };
+
 export default App;

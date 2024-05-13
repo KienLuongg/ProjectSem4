@@ -64,7 +64,7 @@ const DropdownUser = () => {
         <span className="h-12 w-12 rounded-full">
           <img
             className="h-12 w-12 rounded-full"
-            src="https://scontent.fhan14-1.fna.fbcdn.net/v/t39.30808-6/289339360_829188891381135_4968971814826901530_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=5f2048&_nc_ohc=VlnkkpDWhP8AX83NeMS&_nc_ht=scontent.fhan14-1.fna&oh=00_AfDJ0sj1SIlwzZDryIewjs4HuVijrfiXj_GZG-g-wP9gcg&oe=6612926B"
+            src="src/images/user/user1102.jpeg"
             alt="User"
           />
         </span>

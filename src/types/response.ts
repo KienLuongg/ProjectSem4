@@ -50,9 +50,44 @@ export interface SchoolYearsData {
 
 export interface SchoolYearTeacherData {
   id: number;
-  teacherId: number;
-  schoolYearId: number;
+  teacher: {
+    id: number;
+    officerNumber: string;
+    sortName: string;
+    joiningDate: string;
+    active: boolean;
+    positionId: number | null;
+    departments: any[];
+    user: {
+      id: number;
+      username: string;
+      password: string;
+      realPassword: string;
+      token: string | null;
+      createdAt: string;
+      userDetail: {
+        id: number;
+        firstname: string;
+        lastname: string;
+        address: string;
+        phone: string;
+        email: string;
+        gender: boolean;
+        birthday: string;
+        citizen_id: string;
+        nation: string | null;
+        avatar: string;
+      }[];
+    };
+  };
+  schoolYear: {
+    id: number;
+    startSem1: string;
+    startSem2: string;
+    end: string;
+  };
 }
+
 
 export interface SchoolYearClassData {
   id: number;
@@ -93,4 +128,57 @@ export interface Subjects {
   name: string;
   type: string;
   code: string;
+}
+
+export interface DataTypeAcknowledge {
+  key: number;
+  Stt: number;
+  Ho_Ten: string;
+  Ngay_sinh: string;
+  Nhan_Xet: JSX.Element;
+  Trang_Thai: string
+}
+export interface DataAllClass {
+  classId: number,
+  className: string,
+  SchoolBlock: {
+    schoolBlockId: number,
+    schoolBlockName: number
+  }
+}
+export interface Student {
+  id: number,
+  gender: boolean,
+  firstName: string,
+  lastName: string,
+  birthday: string,
+  address: string,
+  status: number,
+  studentCode: string,
+}
+export interface Acknowledge {
+  id: number,
+  Acknowledge: string
+}
+export interface DataTypeEvaluate {
+  key: number;
+  Stt: number;
+  Ho_Ten: string;
+  Ngay_sinh: string;
+  Nhan_Xet: JSX.Element;
+  Toan: number,
+  Tieng_viet: number;
+  Tieng_anh: number;
+  Dao_duc: number;
+  Tu_nhien_va_xa_hoi: number;
+  Lich_su: number;
+  Dia_ly: number;
+  Khoa_hoc: number;
+  Tin_hoc_va_cong_nghe: number;
+  The_duc: number;
+  Mi_thuat: number;
+  Am_nhac: number;
+  Trang_Thai: string;
+  Hanh_kiem: string;
+  Tong: number;
 }
