@@ -353,7 +353,7 @@ const Attendences = () => {
     ];
     const dataAttendenceByDay = student.map((data) => ({
         key: data.id,
-        Ho_Ten: data.students.lastName + data.students.firstName, // Assuming `s` contains the name of the student
+        Ho_Ten: data.students.lastName + ' ' + data.students.firstName, // Assuming `s` contains the name of the student
         Ngay_sinh: formatDate(data.students.birthday.substring(0, 10)),
         Stt: data.id,
         Co_Mat: <Checkbox></Checkbox>,

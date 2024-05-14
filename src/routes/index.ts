@@ -15,6 +15,7 @@ const TeachingAssign = lazy(() => import('../pages/Teaching/Teaching-assignment'
 const AssignmentList = lazy(() => import('../pages/Teaching/Teaching-assign-list'))
 const Acknowledge = lazy(() => import('../pages/Acknowledge'))
 const Evaluate = lazy(() => import('../pages/Evaluate'))
+const Tec = lazy(() => import('../pages/tec'))
 
 const coreRoutes = [
   {
@@ -91,6 +92,11 @@ const coreRoutes = [
     path: '/evaluate',
     title: 'Evaluate',
     component: Evaluate,
+  },
+  {
+    path: '/tec',
+    title: 'Evaluate',
+    component: Tec,
   },
 ];
 

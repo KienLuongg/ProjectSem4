@@ -77,7 +77,7 @@ export default function Teachers({ onAdd }: any) {
         const values = await form.validateFields();
         console.log(values)
         // values['role'] = [1];
-        values['gender'] = values['gender'] === "true";
+        // values['gender'] = values['gender'] === "true";
         values['avatar'] = values['avatar'].length > 0 ? values['avatar'].thumbUrl : ''
 
         // Call postCreateSchoolYear function from teacherApi
@@ -85,7 +85,7 @@ export default function Teachers({ onAdd }: any) {
             .then(response => {
                 setIsModalOpen(false);
                 message.success("thêm giáo viên thành công")
-                fetTeacher()
+
             }).catch((err) => {
                 var error = err.response.data as ErrRes;
                 console.log(error)
@@ -94,6 +94,23 @@ export default function Teachers({ onAdd }: any) {
             })
 
     }
+
+    const renderBirthday = (text: any, record: TeacherData) => {
+        const date = new Date(record.user.userDetail.birthday);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
+    const renderJoiningDate = (text: any, record: TeacherData) => {
+        const date = new Date(record.joiningDate);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
     const handleChange = (value: string) => {
         console.log(`selected ${value}`);
     };
@@ -171,7 +188,7 @@ export default function Teachers({ onAdd }: any) {
                                                 <Col span={12}>
                                                     <Form.Item
                                                         label="Họ:"
-                                                        name="lastname"
+                                                        name="last_name"
                                                         rules={[{ required: true, message: 'Please input!' }]}
                                                     >
                                                         <Input />
@@ -182,7 +199,7 @@ export default function Teachers({ onAdd }: any) {
                                                 <Col span={12}>
                                                     <Form.Item
                                                         label="Tên:"
-                                                        name="firstname"
+                                                        name="first_name"
                                                         rules={[{ required: true, message: 'Please input!' }]}
                                                     >
                                                         <Input />
@@ -203,8 +220,8 @@ export default function Teachers({ onAdd }: any) {
                                                         rules={[{ required: true, message: 'Please select!' }]}
                                                     >
                                                         <Radio.Group>
-                                                            <Radio value="false">Nam</Radio>
-                                                            <Radio value="true">Nữ</Radio>
+                                                            <Radio value="true">Nam</Radio>
+                                                            <Radio value="false">Nữ</Radio>
                                                         </Radio.Group>
                                                     </Form.Item></Col>
 
@@ -316,12 +333,10 @@ export default function Teachers({ onAdd }: any) {
                     <Table.Column
                         title="Họ và tên"
                         render={(text, record: TeacherData) =>
-                            `${record.user.userDetail.firstname} ${record.user.userDetail.firstname}`
+                            `${record.user.userDetail.firstname} ${record.user.userDetail.lastname}`
                         }
                     />
-                    <Table.Column title="Ngày sinh" render={(text, record: TeacherData) =>
-                        `${record.user.userDetail.birthday}`
-                    } />
+                    <Table.Column title="Ngày sinh" render={renderBirthday} />
                     <Table.Column title="Giới tính" render={(text, record: TeacherData) =>
                         `${record.user.userDetail.gender === "true" ? "famale" : "male"}`
                     } />
@@ -334,9 +349,7 @@ export default function Teachers({ onAdd }: any) {
                             return r.name
                         })}`
                     } />
-                    <Table.Column title="Ngày gia nhập" render={(text, record: TeacherData) =>
-                        `${record.joiningDate}`
-                    } />
+                    <Table.Column title="Ngày gia nhập" render={renderJoiningDate} />
                 </Table>
 
             </div>

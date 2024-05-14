@@ -99,10 +99,20 @@ export interface SchoolYearClassData {
   classCode: string;
 }
 
-export interface SchoolYearSubjectData {
+export interface SchoolYearSubjectResponse {
   id: number;
-  schoolYearId: string;
-  subjectIds: string[];
+  subject: {
+    id: number;
+    code: string;
+    type: string;
+    name: string;
+  };
+  schoolYear: {
+    id: number;
+    startSem1: string;
+    startSem2: string;
+    end: string;
+  };
 }
 
 export interface ProgramData {
@@ -195,16 +205,14 @@ export interface Student {
     birthday: string,
     address: string,
     studentCode: string,
-    studentStatuses: [
-      {
-        id: number,
-        description: string,
-        status: {
-          id: number,
-          name: string,
-          code: string,
-        }
+    studentStatuses: {
+      id: number;
+      description: string;
+      status: {
+        id: number;
+        name: string;
+        code: string;
       }
-    ]
+    }[]
   }
 }

@@ -57,8 +57,8 @@ export default function SchoolYearClass() {
     const fetchTeacherSchoolYears = () => {
         teacherApi.getTeacherSchoolYear()
             .then(response => {
-                setTeacherSchoolYears(response.data.teacher);
-                console.log(response.data.teacher)
+                setTeacherSchoolYears(response.data);
+                console.log(response.data)
             })
             .catch(error => {
                 console.error('Error fetching teacher school years:', error);
@@ -73,10 +73,15 @@ export default function SchoolYearClass() {
         setIsModalOpen(false);
     };
 
+    const getSchoolYearId = localStorage.getItem('idYear');
+
     const handleSubmit = async () => {
         try {
             const formData = await form.validateFields();
+            console.log(formData)
+            formData['schoolYear'] = getSchoolYearId;
             const res = await teacherApi.postCreateSchoolYearClass(formData);
+
             console.log('Data submitted:', res.data);
             setIsModalOpen(false);
             // fetchData();
@@ -174,9 +179,9 @@ export default function SchoolYearClass() {
                                 rules={[{ required: true, message: 'Vui lòng chọn giáo viên!' }]}
                             >
                                 <Select>
-                                    {teacherSchoolYears.map((teacher: any) => (
-                                        <Select.Option key={teacher.id} value={teacher.id}>
-                                            {teacher.user.name}
+                                    {teacherSchoolYears.map(t => (
+                                        <Select.Option key={t.id} value={t.id}>
+                                            {t.teacher.user.userDetail.map(teacherName => { return teacherName.firstname + ' ' + teacherName.lastname })}
                                         </Select.Option>
                                     ))}
                                 </Select>

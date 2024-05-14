@@ -3,6 +3,7 @@ import { Button, Col, Row, Form, Table, Modal, message, Select, Input } from 'an
 import axios from 'axios';
 import mainAxios from '../../apis/main-axios';
 import teacherApi from '../../apis/urlApi';
+import { GradeData, SchoolYearSubjectResponse } from '../../types/response';
 
 interface ProgramData {
     id: number;
@@ -12,26 +13,19 @@ interface ProgramData {
     sem: string;
 }
 
-// interface Grade {
-//     id: string;
-//     name: string;
-// }
 
-interface SchoolYearSubject {
-    id: string;
-    name: string;
-}
+
 
 export default function SchoolProgram() {
     const [schoolProgram, setSchoolProgram] = useState<ProgramData[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
-    // const [grades, setGrades] = useState<Grade[]>([]);
-    const [schoolYearSubjects, setSchoolYearSubjects] = useState<SchoolYearSubject[]>([]);
+    const [grades, setGrades] = useState<GradeData[]>([]);
+    const [schoolYearSubjects, setSchoolYearSubjects] = useState<SchoolYearSubjectResponse[]>([]);
 
     useEffect(() => {
         fetchData();
-        // fetchGrades();
+        fetchGrades();
         fetchSchoolYearSubjects();
     }, []);
 
@@ -44,15 +38,15 @@ export default function SchoolProgram() {
             });
     };
 
-    // const fetchGrades = () => {
-    //     axios.get('API_ENDPOINT_FOR_GRADES')
-    //         .then(response => {
-    //             setGrades(response.data);
-    //         })
-    //         .catch(error => {
-    //             console.error('Error fetching grades:', error);
-    //         });
-    // };
+    const fetchGrades = () => {
+        teacherApi.getGrades()
+            .then(response => {
+                setGrades(response.data.body);
+            })
+            .catch(error => {
+                console.error('Error fetching grades:', error);
+            });
+    };
 
     const fetchSchoolYearSubjects = () => {
         teacherApi.getSchoolYearSubject()
@@ -121,9 +115,8 @@ export default function SchoolProgram() {
                             labelWrap
                             wrapperCol={{ flex: 1 }}
                             colon={false}
-                            style={{ maxWidth: 600 }}
                         >
-                            {/* <Form.Item
+                            <Form.Item
                                 label="Khối"
                                 name="gradeId"
                                 rules={[{ required: true, message: 'Vui lòng chọn một khối!' }]}
@@ -135,16 +128,16 @@ export default function SchoolProgram() {
                                         </Select.Option>
                                     ))}
                                 </Select>
-                            </Form.Item> */}
+                            </Form.Item>
                             <Form.Item
                                 label="Danh sách môn"
                                 name="schoolYearSubjectId"
                                 rules={[{ required: true, message: 'Vui lòng chọn một năm học!' }]}
                             >
                                 <Select>
-                                    {schoolYearSubjects.map(subject => (
-                                        <Select.Option key={subject.id} value={subject.id}>
-                                            {subject.name}
+                                    {schoolYearSubjects.map(s => (
+                                        <Select.Option key={s.id} value={s.id}>
+                                            {s.subject.name}
                                         </Select.Option>
                                     ))}
                                 </Select>
@@ -174,7 +167,7 @@ export default function SchoolProgram() {
             <Table dataSource={schoolProgram} rowKey="id" className=' text-black dark:text-white'>
                 <Table.Column title="Id" dataIndex="id" />
                 <Table.Column title="Môn học" dataIndex="schoolYearSubjectId" />
-                {/* <Table.Column title="Khối" dataIndex="gradeId" /> */}
+                <Table.Column title="Khối" dataIndex="gradeId" />
                 <Table.Column title="Số tiết" dataIndex="number" />
             </Table>
         </div>

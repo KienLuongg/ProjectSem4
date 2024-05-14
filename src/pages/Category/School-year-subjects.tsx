@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, message, Modal, Select, Table } from 'antd';
 import teacherApi from '../../apis/urlApi';
-import { SchoolYearSubjectData, SchoolYearsData, Subjects } from '../../types/response';
+import { SchoolYearSubjectResponse, SchoolYearsData, Subjects } from '../../types/response';
+import { data } from 'jquery';
 
 export default function SchoolYearSubject() {
     const [subjects, setSubjects] = useState<Subjects[]>([]);
-    const [schoolYears, setSchoolYears] = useState<SchoolYearsData[]>([]);
-    const [schoolYearSubject, setSchoolYearSubject] = useState<SchoolYearSubjectData[]>([]);
+    const [schoolYearSubject, setSchoolYearSubject] = useState<SchoolYearSubjectResponse[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
 
     useEffect(() => {
         fetchData();
         fetchSubjects();
-        fetchSchoolYears();
     }, []);
 
     const fetchData = () => {
         teacherApi.getSchoolYearSubject()
             .then(response => setSchoolYearSubject(response.data))
             .catch(error => console.error('Error fetching data:', error));
+
     };
 
     const fetchSubjects = () => {
@@ -28,23 +28,20 @@ export default function SchoolYearSubject() {
             .catch(error => console.error('Error fetching subjects:', error));
     };
 
-    const fetchSchoolYears = () => {
-        teacherApi.getSchoolYear()
-            .then(response => setSchoolYears(response.data))
-            .catch(error => console.error('Error fetching school years:', error));
-    };
 
     const showModal = () => setIsModalOpen(true);
 
     const handleCancel = () => setIsModalOpen(false);
 
+    const getSchoolYearId = localStorage.getItem('idYear');
+
     const handleSubmit = async () => {
         try {
             const formData = await form.validateFields();
+            formData['schoolYearId'] = getSchoolYearId;
             const res = await teacherApi.postCreateSchoolYearSubject(formData);
             console.log('Data submitted:', res.data);
             setIsModalOpen(false);
-            fetchData();
             message.success('Data submitted successfully!');
         } catch (error: any) {
             if (error.response) console.error('Server Error:', error.response.data);
@@ -81,26 +78,13 @@ export default function SchoolYearSubject() {
                     >
                         <Form.Item
                             label="Môn học"
-                            name="subjectId"
+                            name="subjectIds"
                             rules={[{ required: true, message: 'Vui lòng chọn môn học!' }]}
                         >
-                            <Select>
+                            <Select mode="multiple">
                                 {subjects.map(subject => (
-                                    <Select.Option key={subject.id} value={subject.id.toString()}>
+                                    <Select.Option key={subject.id} value={subject.id}>
                                         {subject.name}
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                        <Form.Item
-                            label="Năm học"
-                            name="schoolYearId"
-                            rules={[{ required: true, message: 'Vui lòng chọn năm học!' }]}
-                        >
-                            <Select>
-                                {schoolYears.map(schoolYear => (
-                                    <Select.Option key={schoolYear.id} value={schoolYear.id.toString()}>
-                                        {schoolYear.id}
                                     </Select.Option>
                                 ))}
                             </Select>
@@ -112,14 +96,8 @@ export default function SchoolYearSubject() {
                 <Table.Column title="Id" dataIndex="id" />
                 <Table.Column
                     title="Môn học"
-                    dataIndex="subjectIds"
-                    render={(subjectIds: number[]) => {
-                        const subjectNames = subjectIds.map(subjectId => {
-                            const foundSubject = subjects.find(subject => subject.id === subjectId);
-                            return foundSubject ? foundSubject.name : '';
-                        });
-                        return subjectNames.join(', ');
-                    }}
+                    dataIndex="subject"
+                    render={(subject: { name: string }) => subject.name}
                 />
             </Table>
         </div>

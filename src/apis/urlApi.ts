@@ -43,9 +43,8 @@ const teacherApi = {
     return mainAxios.post(URL.CREATE_TEACHER_SCHOOL_YEAR, payload);
   },
   postCreateSchoolYearSubject: (payload: {
-    subject: number;
-    subjects: number[];
-    schoolYear: number;
+    subjectIds: number[];
+    schoolYearId: number;
   }): Promise<IResponse<any>> => {
     return mainAxios.post(URL.CREATE_SCHOOL_YEAR_SUBJECT, payload);
   },
@@ -74,10 +73,12 @@ const teacherApi = {
     return mainAxios.get(`${URL.GET_SCHOOL_YEAR}/${id}`);
   },
   getTeacherSchoolYear: (): Promise<IResponse<any>> => {
-    return mainAxios.get(URL.GET_TEACHER_SCHOOL_YEAR);
+    const getSchoolYearId = localStorage.getItem("idYear")
+    return mainAxios.get(`${URL.GET_TEACHER_SCHOOL_YEAR}?schoolYearId=${getSchoolYearId}`);
   },
   getSchoolYearSubject: (): Promise<IResponse<any>> => {
-    return mainAxios.get(URL.GET_SCHOOL_YEAR_SUBJECT);
+    const getSchoolYearId = localStorage.getItem("idYear")
+    return mainAxios.get(`${URL.GET_SCHOOL_YEAR_SUBJECT}?schoolYearId=${getSchoolYearId}`);
   },
   getSchoolYearClass: (): Promise<IResponse<any>> => {
     return mainAxios.get(URL.GET_SCHOOL_YEAR_CLASS);

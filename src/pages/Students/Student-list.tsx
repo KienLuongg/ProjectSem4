@@ -26,9 +26,9 @@ export default function Students() {
   const getYear = localStorage.getItem('idYear');
 
   useEffect(() => {
-    mainAxios.get('/api/v1/student/get-student-year-info-by?bySchoolYearId=1')
+    mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearId=${getYear}`)
       .then((response) => {
-        setStudents(response.data.students);
+        setStudents(response.data);
         console.log('Fetched students:', response.data); // Log fetched students
       })
       .catch((error) => {
@@ -66,6 +66,12 @@ export default function Students() {
       }
       message.error('Failed to submit data. Please try again later.');
     }
+  };
+
+  const renderStudentStatuses = (text: any, record: Student) => {
+    return record.students.studentStatuses
+      .map(status => status.description)
+      .join(', ');
   };
 
   return (
@@ -165,20 +171,44 @@ export default function Students() {
 
       {/* Bảng hiển thị danh sách học sinh */}
       <Table dataSource={students} rowKey="id">
-        <Table.Column title="Mã học sinh" dataIndex="studentCode" />
+        <Table.Column
+          title="Mã học sinh"
+          render={(text, record: Student) =>
+            `${record.students.studentCode}`
+          }
+        />
         <Table.Column
           title="Họ và tên"
           render={(text, record: Student) =>
             `${record.students.firstName} ${record.students.lastName}`
           }
         />
-        <Table.Column title="Ngày sinh"
+        <Table.Column
+          title="Ngày sinh"
+          render={(text, record: Student) => {
+            const date = new Date(record.students.birthday);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+          }}
+        />
+        <Table.Column
+          title="Giới tính"
           render={(text, record: Student) =>
-            `${record.students.birthday}`
-          } />
-        <Table.Column title="Giới tính" dataIndex="gender" />
-        <Table.Column title="Địa chỉ" dataIndex="address" />
-        <Table.Column title="Trạng thái" dataIndex="status" />
+            `${record.students.studentCode}`
+          }
+        />
+        <Table.Column
+          title="Địa chỉ"
+          render={(text, record: Student) =>
+            `${record.students.address}`
+          }
+        />
+        <Table.Column
+          title="Trạng thái"
+          render={renderStudentStatuses}
+        />
       </Table>
     </div>
   );
