@@ -146,16 +146,7 @@ export interface DataAllClass {
     schoolBlockName: number
   }
 }
-export interface Student {
-  id: number,
-  gender: boolean,
-  firstName: string,
-  lastName: string,
-  birthday: string,
-  address: string,
-  status: number,
-  studentCode: string,
-}
+
 export interface Acknowledge {
   id: number,
   Acknowledge: string
@@ -181,4 +172,39 @@ export interface DataTypeEvaluate {
   Trang_Thai: string;
   Hanh_kiem: string;
   Tong: number;
+}
+
+export interface DataTypeAttendence {
+  key: number;
+  Stt: number;
+  Ho_Ten: string;
+  Ngay_sinh: string;
+  Co_Mat: JSX.Element;
+  Nghi_Co_Phep: JSX.Element;
+  Nghi_Khong_Phep: JSX.Element;
+  Trang_Thai: number
+}
+
+export interface Student {
+  id: number,
+  students: {
+    id: number,
+    gender: boolean,
+    firstName: string,
+    lastName: string,
+    birthday: string,
+    address: string,
+    studentCode: string,
+    studentStatuses: [
+      {
+        id: number,
+        description: string,
+        status: {
+          id: number,
+          name: string,
+          code: string,
+        }
+      }
+    ]
+  }
 }

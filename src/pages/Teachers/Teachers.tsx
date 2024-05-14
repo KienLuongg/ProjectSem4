@@ -101,23 +101,16 @@ export default function Teachers({ onAdd }: any) {
         value: r.id,
         label: r.name
     }));
-    return (<>
+    return (<div className='p-4 md:p-6 2xl:p-10'>
         {isLoading ? (
             <Loader />
         ) : (
             <div>
 
-                <Breadcrumb pageName='Teachers' />
-                <Row style={{ marginBottom: '15px' }}>
+                {/* <Breadcrumb pageName='Teachers' /> */}
+                <Row style={{ marginBottom: '' }}>
                     <Col span={24} style={{ textAlign: 'right' }}>
-                        <Form.Item
-                            label=" "
-                            labelAlign="left"
-                            colon={false}
-                            labelCol={{ span: 24 }}
-                            wrapperCol={{ span: 24 }}
-                            style={{ marginBottom: '8px', paddingRight: '56px' }}
-                        >
+                        <Form.Item>
                             <div>
                                 <Button type="default" onClick={showModal} style={{ marginLeft: '20px' }}>
                                     Thêm
@@ -144,7 +137,7 @@ export default function Teachers({ onAdd }: any) {
                                             labelWrap
                                             wrapperCol={{ flex: 1 }}
                                             colon={false}
-                                            style={{ maxWidth: 650 }}
+                                            className='max-w-150'
                                             form={form}
                                         >
                                             <Row gutter={[16, 0]}>
@@ -348,6 +341,6 @@ export default function Teachers({ onAdd }: any) {
 
             </div>
         )}
-    </>
+    </div>
     );
 }

@@ -95,7 +95,7 @@ export default function SchoolYearClass() {
 
 
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto p-4 md:p-6 2xl:p-10">
             <Row justify="space-between" className="mb-6">
                 <Col>
                     <Button type="default" onClick={showModal}>

@@ -75,7 +75,7 @@ export default function SchoolYearTeacher() {
     };
 
     return (
-        <div className="p-4">
+        <div className="p-4 md:p-6 2xl:p-10">
             <Row className="mb-4">
                 <Col span={12}></Col>
                 <Col span={12} className="text-right">

@@ -43,6 +43,7 @@ mainAxios.interceptors.response.use(
           '/api/v1/auth/refresh-token',
           { refresh_token: refreshToken }
         );
+        console.log(refreshResponse)
 
         // Cập nhật token mới và refresh token trong cookie
         setCookie(Storage.token, refreshResponse.data.token);

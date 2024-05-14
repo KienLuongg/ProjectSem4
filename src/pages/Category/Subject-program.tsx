@@ -93,7 +93,7 @@ export default function SchoolProgram() {
     };
 
     return (
-        <div>
+        <div className='p-4 md:p-6 2xl:p-10'>
             <Row style={{ marginBottom: '15px' }}>
                 <Col span={12}></Col>
                 <Col span={12} style={{ textAlign: 'right' }}>

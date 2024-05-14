@@ -183,7 +183,7 @@ const App: React.FC = () => {
         console.log('search:', value);
     };
 
-    return <div>
+    return <div className='p-4 md:p-6 2xl:p-1'>
 
         <Row>
             <Col span={6} >

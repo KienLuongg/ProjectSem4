@@ -211,7 +211,7 @@ const App: React.FC = () => {
         },
     ];
 
-    return <div>
+    return <div className='p-4 md:p-6 2xl:p-1'>
         <Breadcrumb className="mb-4">
             <Breadcrumb.Item className="text-3xl text-black">Phân công giảng dạy</Breadcrumb.Item>
         </Breadcrumb>

@@ -70,7 +70,7 @@
     margin-right: 12px;
     margin-left: 12px;
     border: 1px solid green;
-    width: 87px;
+    width:100px;
     display: flex;
     align-items: center;
     border-radius: 5px;
@@ -79,7 +79,7 @@
 
 .number-student-go-to-school {
     border: 1px solid #3333;
-    width: 97px;
+    width: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -90,7 +90,7 @@
     margin-left: 12px;
     margin-right: 12px;
     border: 1px solid #3333;
-    width: 99px;
+    width: 120px;
     border-radius: 5px;
     display: flex;
     align-items: center;

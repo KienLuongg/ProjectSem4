@@ -55,7 +55,7 @@ export default function SchoolYearSubject() {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 md:p-6 2xl:p-10">
             <div className="flex justify-between items-center mb-4">
                 <Button type="default" onClick={showModal}>
                     Thêm

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
-import { DatePicker, Space } from 'antd';
+import { DatePicker, Select, Space } from 'antd';
 import { Button } from 'antd';
 import dayjs from 'dayjs';
 import { Table } from 'antd';
@@ -8,293 +8,284 @@ import { Checkbox } from 'antd';
 import type { TableColumnsType, TableProps } from 'antd';
 import Students from "../Students/Student-list";
 import axios from "axios";
+import { DataAllClass, DataTypeAttendence, Student } from "../../types/response";
+import mainAxios from "../../apis/main-axios";
 type TableRowSelection<T> = TableProps<T>['rowSelection'];
 
-interface DataType {
-    key: number;
-    Stt: number;
-    Ho_Ten: string;
-    Ngay_sinh: string;
-    Co_Mat: JSX.Element;
-    Nghi_Co_Phep: JSX.Element;
-    Nghi_Khong_Phep: JSX.Element;
-    Trang_Thai: number
-}
-interface DataAllClass {
-    classId: string,
-    className: string,
-    SchoolBlock: {
-        schoolBlockId: string,
-        schoolBlockName: number
-    }
-}
-interface Student {
-    id: number,
-    gender: boolean,
-    firstName: string,
-    lastName: string,
-    birthday: string,
-    address: string,
-    status: number,
-    studentCode: string,
-}
+
 const Attendences = () => {
     const AllClasses: DataAllClass[] = [{
-        "classId": "01",
+        "classId": 1,
         "className": "1a1",
         SchoolBlock: {
-            "schoolBlockId": "01",
+            "schoolBlockId": 1,
             "schoolBlockName": 1
         }
     }, {
-        "classId": "02",
+        "classId": 2,
         "className": "1a2",
         SchoolBlock: {
-            "schoolBlockId": "01",
+            "schoolBlockId": 1,
             "schoolBlockName": 1
         }
     },
     {
-        "classId": "03",
+        "classId": 3,
         "className": "1a3",
         SchoolBlock: {
-            "schoolBlockId": "01",
+            "schoolBlockId": 1,
             "schoolBlockName": 1
         }
     },
     {
-        "classId": "04",
+        "classId": 4,
         "className": "1a4",
         SchoolBlock: {
-            "schoolBlockId": "01",
+            "schoolBlockId": 1,
             "schoolBlockName": 1
         }
     },
     {
-        "classId": "05",
+        "classId": 5,
         "className": "1a5",
         SchoolBlock: {
-            "schoolBlockId": "01",
+            "schoolBlockId": 1,
             "schoolBlockName": 1
         }
     },
     {
-        "classId": "06",
+        "classId": 6,
         "className": "1a6",
         SchoolBlock: {
-            "schoolBlockId": "01",
+            "schoolBlockId": 1,
             "schoolBlockName": 1
         }
     },
     {
-        "classId": "07",
+        "classId": 7,
         "className": "2a1",
         SchoolBlock: {
-            "schoolBlockId": "02",
+            "schoolBlockId": 2,
             "schoolBlockName": 2
         }
     },
     {
-        "classId": "08",
+        "classId": 8,
         "className": "2a2",
         SchoolBlock: {
-            "schoolBlockId": "02",
+            "schoolBlockId": 2,
             "schoolBlockName": 2
         }
     },
     {
-        "classId": "09",
+        "classId": 9,
         "className": "2a3",
         SchoolBlock: {
-            "schoolBlockId": "02",
+            "schoolBlockId": 2,
             "schoolBlockName": 2
         }
     },
     {
-        "classId": "10",
+        "classId": 10,
         "className": "2a4",
         SchoolBlock: {
-            "schoolBlockId": "02",
+            "schoolBlockId": 2,
             "schoolBlockName": 2
         }
     },
 
     {
-        "classId": "11",
+        "classId": 11,
         "className": "2a5",
         SchoolBlock: {
-            "schoolBlockId": "02",
+            "schoolBlockId": 2,
             "schoolBlockName": 2
         }
     }, {
-        "classId": "12",
+        "classId": 12,
         "className": "2a6",
         SchoolBlock: {
-            "schoolBlockId": "02",
+            "schoolBlockId": 2,
             "schoolBlockName": 2
         }
     },
     {
-        "classId": "13",
+        "classId": 13,
         "className": "3a1",
         SchoolBlock: {
-            "schoolBlockId": "03",
+            "schoolBlockId": 3,
             "schoolBlockName": 3
         }
     }
         ,
     {
-        "classId": "14",
+        "classId": 14,
         "className": "3a2",
         SchoolBlock: {
-            "schoolBlockId": "03",
+            "schoolBlockId": 3,
             "schoolBlockName": 3
         }
     }
         ,
     {
-        "classId": "15",
+        "classId": 15,
         "className": "3a3",
         SchoolBlock: {
-            "schoolBlockId": "03",
+            "schoolBlockId": 3,
             "schoolBlockName": 3
         }
     }
         ,
     {
-        "classId": "16",
+        "classId": 16,
         "className": "3a4",
         SchoolBlock: {
-            "schoolBlockId": "03",
+            "schoolBlockId": 3,
             "schoolBlockName": 3
         }
     }
         ,
     {
-        "classId": "17",
+        "classId": 17,
         "className": "3a5",
         SchoolBlock: {
-            "schoolBlockId": "03",
+            "schoolBlockId": 3,
             "schoolBlockName": 3
         }
     }
         ,
     {
-        "classId": "18",
+        "classId": 18,
         "className": "3a6",
         SchoolBlock: {
-            "schoolBlockId": "03",
+            "schoolBlockId": 3,
             "schoolBlockName": 3
         }
     },
     {
-        "classId": "19",
+        "classId": 19,
         "className": "4a1",
         SchoolBlock: {
-            "schoolBlockId": "04",
+            "schoolBlockId": 4,
             "schoolBlockName": 4
         }
     },
     {
-        "classId": "20",
+        "classId": 20,
         "className": "4a2",
         SchoolBlock: {
-            "schoolBlockId": "04",
+            "schoolBlockId": 4,
             "schoolBlockName": 4
         }
     },
     {
-        "classId": "21",
+        "classId": 21,
         "className": "4a3",
         SchoolBlock: {
-            "schoolBlockId": "04",
+            "schoolBlockId": 4,
             "schoolBlockName": 4
         }
     },
     {
-        "classId": "22",
+        "classId": 22,
         "className": "4a4",
         SchoolBlock: {
-            "schoolBlockId": "04",
+            "schoolBlockId": 4,
             "schoolBlockName": 4
         }
     },
     {
-        "classId": "23",
+        "classId": 23,
         "className": "4a5",
         SchoolBlock: {
-            "schoolBlockId": "04",
+            "schoolBlockId": 4,
             "schoolBlockName": 4
         }
     },
     {
-        "classId": "24",
+        "classId": 24,
         "className": "4a6",
         SchoolBlock: {
-            "schoolBlockId": "04",
+            "schoolBlockId": 4,
             "schoolBlockName": 4
         }
     },
     {
-        "classId": "25",
+        "classId": 25,
         "className": "5a1",
         SchoolBlock: {
-            "schoolBlockId": "05",
+            "schoolBlockId": 5,
             "schoolBlockName": 5
         }
     },
     {
-        "classId": "26",
+        "classId": 26,
         "className": "5a2",
         SchoolBlock: {
-            "schoolBlockId": "05",
+            "schoolBlockId": 5,
             "schoolBlockName": 5
         }
     },
     {
-        "classId": "27",
+        "classId": 27,
         "className": "5a3",
         SchoolBlock: {
-            "schoolBlockId": "05",
+            "schoolBlockId": 5,
             "schoolBlockName": 5
         }
     },
     {
-        "classId": "28",
+        "classId": 28,
         "className": "5a4",
         SchoolBlock: {
-            "schoolBlockId": "05",
+            "schoolBlockId": 5,
             "schoolBlockName": 5
         }
     },
     {
-        "classId": "29",
+        "classId": 29,
         "className": "5a5",
         SchoolBlock: {
-            "schoolBlockId": "05",
+            "schoolBlockId": 5,
             "schoolBlockName": 5
         }
     },
     {
-        "classId": "30",
+        "classId": 30,
         "className": "5a6",
         SchoolBlock: {
-            "schoolBlockId": "05",
+            "schoolBlockId": 5,
             "schoolBlockName": 5
         }
     }
     ];
     const [student, setStudent] = useState<Student[]>([])
+    const [classe, setClasse] = useState<DataAllClass[]>(AllClasses);
+    const getClass = localStorage.getItem('idClass');
+    const [idClass, setIdClass] = useState(parseInt(getClass!) ?? 1);
+    const idYear = localStorage.getItem('idYear');
+
+    const options = classe.map(c => ({
+        value: c.classId,
+        label: c.className
+    }));
+    useEffect(() => {
+
+        localStorage.setItem('idClass', idClass.toString())
+
+    }, [idClass])
+    const handleChange = (value: number) => {
+        setIdClass(value)
+    };
     // cont
     const getStudents = async () => {
-        const s = await axios.get('http://14.248.97.203:4869/api/v1/student/students');
+        const s = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${idClass}`);
         setStudent(s.data);
     }
     useEffect(() => {
         getStudents();
     }, [student])
-    console.log(student[1])
-    const rowSelection: TableRowSelection<DataType> = {
+    const rowSelection: TableRowSelection<DataTypeAttendence> = {
         onSelect: (record, selected, selectedRows) => {
             console.log(record, selected, selectedRows);
         },
@@ -302,7 +293,14 @@ const Attendences = () => {
             console.log(selected, selectedRows, changeRows);
         },
     };
-    const columnsAttendenceByDay: TableColumnsType<DataType> = [
+    const formatDate = (dateString: string) => {
+        const dateObject = new Date(dateString);
+        const day = String(dateObject.getDate()).padStart(2, '0');
+        const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // January is 0!
+        const year = dateObject.getFullYear();
+        return `${day}${month}${year}`;
+    }
+    const columnsAttendenceByDay: TableColumnsType<DataTypeAttendence> = [
         {
             title: 'Stt',
             dataIndex: 'Stt',
@@ -347,23 +345,23 @@ const Attendences = () => {
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'Trạng_Thái',
+            dataIndex: 'Trang_Thai',
             width: '14%',
-            key: 'Trạng_Thái',
+            key: 'Trang_Thai',
             align: "center"
         }
     ];
     const dataAttendenceByDay = student.map((data) => ({
         key: data.id,
-        Ho_Ten: data.lastName + data.firstName, // Assuming `s` contains the name of the student
-        Ngay_sinh: data.birthday.split('T')[0],
+        Ho_Ten: data.students.lastName + data.students.firstName, // Assuming `s` contains the name of the student
+        Ngay_sinh: formatDate(data.students.birthday.substring(0, 10)),
         Stt: data.id,
         Co_Mat: <Checkbox></Checkbox>,
         Nghi_Co_Phep: <Checkbox></Checkbox>,
         Nghi_Khong_Phep: <Checkbox></Checkbox>,
-        Trang_Thai: data.studentCode
+        Trang_Thai: 0 ? "Đã thông báo" : "chưa thông báo"
     }));
-    const columnsAttendenceByMonth: TableColumnsType<DataType> = [
+    const columnsAttendenceByMonth: TableColumnsType<DataTypeAttendence> = [
         {
             title: 'Stt',
             dataIndex: 'Stt',
@@ -416,13 +414,14 @@ const Attendences = () => {
     ];
     const dataAttendenceByMonth = student.map((data) => ({
         key: data.id,
-        Ho_Ten: data.lastName + data.firstName, // Assuming `s` contains the name of the student
-        Ngay_sinh: data.birthday.split('T')[0],
+        Ho_Ten: data.students.lastName + data.students.firstName, // Assuming `s` contains the name of the student
+        Ngay_sinh: data.students.birthday.substring(0, 10),
         Stt: data.id,
         So_Luot_Muon: 10,
         Tong_Ngay_nghi: 10,
         Nghi_Co_Phep: 5,
         Nghi_Khong_Phep: 5,
+
     }));
 
     const [classes, setClasses] = useState("1a1");
@@ -446,52 +445,24 @@ const Attendences = () => {
             </div>
             <div className={`${attendence !== "attendance-by-day" ? "hiddens" : "attendance-by-day"}`}>
                 <div style={{ display: "flex", padding: "16px" }}>
-                    <div className="class">
-                        <div onClick={() => {
-                            if (classNameClass === "hiddens") {
-                                setClassNameClass("show")
-                            } else {
-                                setClassNameClass("hiddens")
-                            }
-                        }} style={{
-                            width: "117px",
-                            padding: "4px 0px 4px 16px",
-                            borderRadius: "3px",
-                            border: "1px solid #3333",
-                            marginRight: "13px"
-                        }}>
-                            {AllClasses.find(c => c.className === classes)?.className}
-                            <IoIosArrowDown style={{
-                                float: "right",
-                                marginRight: "3px",
-                                marginTop: "3px"
-                            }} />
-                        </div>
-                        <div className={classNameClass}>
-
-                            {AllClasses.map((c => (
-                                <div onClick={() => choseClass(c.className)} key={c.classId} className="classItem">
-                                    {c.className}
-                                </div>
-                            )))}
-                        </div>
-
+                    <div style={{ marginRight: "14px" }}>
+                        <Select style={{ width: "100px", height: "38px" }} options={options} defaultValue={getClass ? options.find(e => e.value == parseInt(getClass))?.value : options[0].value} onChange={handleChange} />
                     </div>
                     <Space direction="vertical">
                         <DatePicker disabledDate={(date) => {
                             return date.isBefore(dayjs(new Date(`${new Date().getFullYear()}/${new Date().getMonth() + 1}/${new Date().getDate()}`)))
-                        }} />
+                        }} className="h-10" />
                     </Space>
-                    <div className="number-student">
-                        Tất cả : 38
+                    <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
+                        Tất cả :{student.length}
                     </div>
-                    <div className="number-student-go-to-school">
+                    <div className="border border-solid border-gray-300 w-40 flex justify-center items-center rounded-md h-10">
                         Có mặt : 38
                     </div>
-                    <div className="Study-permits-are-allowed">
+                    <div className="mx-4 border border-solid border-gray-300 w-45 rounded-md flex items-center justify-center h-10">
                         Có phép : 0
                     </div>
-                    <div className="Study-permits-are-not-allowed">
+                    <div className="border border-solid border-gray-300 w-52 rounded-md flex justify-center items-center h-10">
                         Không phép : 0
                     </div>
                     <div style={{ width: "560px" }}>
