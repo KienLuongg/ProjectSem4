@@ -23,13 +23,15 @@ export default function SchoolYearClass() {
     const fetchData = () => {
         teacherApi.getSchoolYearClass()
             .then(response => {
-                setSchoolYearClass(response.data);
-
+                setSchoolYearClass(response?.data);
+                console.log(response)
             })
+
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
     };
+
 
     const fetchGrades = () => {
         teacherApi.getGrades()
@@ -73,7 +75,7 @@ export default function SchoolYearClass() {
         setIsModalOpen(false);
     };
 
-    const getSchoolYearId = localStorage.getItem('idYear');
+    const getSchoolYearId = parseInt(localStorage.getItem('idYear') ?? '0', 10);
 
     const handleSubmit = async () => {
         try {
@@ -129,7 +131,6 @@ export default function SchoolYearClass() {
                             labelWrap
                             wrapperCol={{ flex: 1 }}
                             colon={false}
-                            style={{ maxWidth: 600 }}
                         >
                             <Form.Item
                                 label="Tên lớp"
@@ -175,7 +176,7 @@ export default function SchoolYearClass() {
                             </Form.Item>
                             <Form.Item
                                 label="Giáo viên"
-                                name="teacherSchoolYearId"
+                                name="teacherSchoolYear"
                                 rules={[{ required: true, message: 'Vui lòng chọn giáo viên!' }]}
                             >
                                 <Select>
@@ -193,18 +194,28 @@ export default function SchoolYearClass() {
             <div>
                 <Row justify="space-between" className="mb-6">
                     <Table dataSource={schoolYearClass} rowKey="id" className="w-full">
-                        <Table.Column title="STT" dataIndex="id" className="w-1/6" />
+                        <Table.Column title="STT" dataIndex="id" className='w-1' />
                         <Table.Column
                             title="Tên lớp"
-                            dataIndex="name" // Replace with the actual data index for class names
-                            className="w-1/6"
-                            render={(text, record) => (
-                                // Render the input field here
-                                <Input placeholder="Search class name" />
-                            )}
+                            dataIndex="className"
                         />
-                        <Table.Column title="Thuộc khối" dataIndex="gradeId" className="w-1/6" />
-                        <Table.Column title="Phòng học" dataIndex="roomId" className="w-1/6" />
+                        <Table.Column
+                            title="Mã lớp"
+                            dataIndex="classCode"
+                        />
+                        <Table.Column title="Thuộc khối" dataIndex="grade"
+                            render={(text, record: SchoolYearClassData) =>
+                                `${record.grade.name}`}
+                        />
+
+                        <Table.Column title="Phòng học" dataIndex="room"
+                            render={(text, record: SchoolYearClassData) =>
+                                `${record.room.name}`}
+                        />
+                        <Table.Column title="Giáo viên chủ nhiệm" dataIndex="teacher"
+                            render={(text, record: SchoolYearClassData) =>
+                                `${record.teacherSchoolYear.teacher.sortName}`}
+                        />
                     </Table>
                 </Row>
             </div>

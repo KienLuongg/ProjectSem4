@@ -58,7 +58,7 @@ export default function SchoolYearSubject() {
                     Thêm
                 </Button>
                 <Modal
-                    title="Thêm năm học"
+                    title="Thêm môn học"
                     visible={isModalOpen}
                     onCancel={handleCancel}
                     footer={[

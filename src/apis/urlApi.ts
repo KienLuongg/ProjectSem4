@@ -10,6 +10,7 @@ enum URL {
   CREATE_SCHOOL_YEAR_SUBJECT = '/api/v1/school/creat-school-year_subject',
   CREATE_SCHOOL_YEAR = '/api/v1/school/creat-school-year',
   CREATE_SCHOOL_YEAR_CLASS = '/api/v1/school/creat-school-year-class',
+  CREATE_SCHOOL_YEAR_SUBJECT_GRADE = '/api/v1/school/creat-school-year-subject-grade',
   GET_TEACHER_SCHOOL_YEAR = '/api/v1/school/teacher-school-year',
   GET_SCHOOL_YEAR_SUBJECT = '/api/v1/school/school-year-subject',
   GET_SCHOOL_YEAR = '/api/v1/school/school-year',
@@ -55,12 +56,19 @@ const teacherApi = {
   }): Promise<IResponse<any>> => {
     return mainAxios.post(URL.CREATE_SCHOOL_YEAR, payload);
   },
-
+  postCreateSchoolYearSubjectGrade: (payload: {
+    gradeId: number;
+    schoolYearSubjectId: number;
+    number: number;
+    sem: string;
+  }): Promise<IResponse<any>> => {
+    return mainAxios.post(URL.CREATE_SCHOOL_YEAR_SUBJECT_GRADE, payload);
+  },
   postCreateSchoolYearClass: (payload: {
     className: string;
     classCode: string;
-    grade: number;
-    room: number;
+    gradeId: number;
+    roomId: number;
     teacherSchoolYear: number;
     schoolYear: number;
   }): Promise<IResponse<any>> => {
@@ -81,7 +89,8 @@ const teacherApi = {
     return mainAxios.get(`${URL.GET_SCHOOL_YEAR_SUBJECT}?schoolYearId=${getSchoolYearId}`);
   },
   getSchoolYearClass: (): Promise<IResponse<any>> => {
-    return mainAxios.get(URL.GET_SCHOOL_YEAR_CLASS);
+    const getSchoolYearId = localStorage.getItem("idYear")
+    return mainAxios.get(`${URL.GET_SCHOOL_YEAR_CLASS}?schoolYearId=${getSchoolYearId}`);
   },
   getGrades: (): Promise<IResponse<any>> => {
     return mainAxios.get(URL.GET_GRADES);

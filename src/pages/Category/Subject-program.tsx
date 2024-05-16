@@ -3,36 +3,35 @@ import { Button, Col, Row, Form, Table, Modal, message, Select, Input } from 'an
 import axios from 'axios';
 import mainAxios from '../../apis/main-axios';
 import teacherApi from '../../apis/urlApi';
-import { GradeData, SchoolYearSubjectResponse } from '../../types/response';
-
-interface ProgramData {
-    id: number;
-    schoolYearSubjectId: string;
-    gradeId: string;
-    number: number;
-    sem: string;
-}
-
-
+import { GradeData, SchoolYearSubjectResponse, SubjectProgram } from '../../types/response';
 
 
 export default function SchoolProgram() {
-    const [schoolProgram, setSchoolProgram] = useState<ProgramData[]>([]);
+    const [schoolProgram, setSchoolProgram] = useState<SubjectProgram[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
     const [grades, setGrades] = useState<GradeData[]>([]);
     const [schoolYearSubjects, setSchoolYearSubjects] = useState<SchoolYearSubjectResponse[]>([]);
 
+    const [defaultGradeId, setDefaultGradeId] = useState<number | undefined>();
+
+
     useEffect(() => {
-        fetchData();
         fetchGrades();
         fetchSchoolYearSubjects();
     }, []);
 
-    const fetchData = () => {
-        mainAxios.get('/api/v1/school/school-year-subject-grade').then(response => {
-            setSchoolProgram(response.data);
-        })
+    useEffect(() => {
+        if (defaultGradeId !== undefined) {
+            fetchData(defaultGradeId);
+        }
+    }, [defaultGradeId]);
+
+    const fetchData = (value: number) => {
+        mainAxios.get(`/api/v1/school/school-year-subject-grade?gradeId=${value}`)
+            .then(response => {
+                setSchoolProgram(response.data);
+            })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
@@ -41,7 +40,11 @@ export default function SchoolProgram() {
     const fetchGrades = () => {
         teacherApi.getGrades()
             .then(response => {
-                setGrades(response.data.body);
+                const gradesData = response.data.body;
+                setGrades(gradesData);
+                if (gradesData.length > 0) {
+                    setDefaultGradeId(gradesData[0].id);
+                }
             })
             .catch(error => {
                 console.error('Error fetching grades:', error);
@@ -72,7 +75,6 @@ export default function SchoolProgram() {
             const res = await mainAxios.post('/api/v1/school/creat-school-year-subject-grade', formData);
             console.log('Data submitted:', res.data);
             setIsModalOpen(false);
-            fetchData();
             message.success('Data submitted successfully!');
         } catch (error: any) {
             if (error.response) {
@@ -86,10 +88,26 @@ export default function SchoolProgram() {
         }
     };
 
+    const handleChangeGrade = (value: number) => {
+        fetchData(value)
+    }
+
     return (
         <div className='p-4 md:p-6 2xl:p-10'>
             <Row style={{ marginBottom: '15px' }}>
-                <Col span={12}></Col>
+                <Col span={12}>
+                    <Select
+                        className='w-30'
+                        onChange={handleChangeGrade}
+                        defaultValue={1}
+                    >
+                        {grades.map(grade => (
+                            <Select.Option key={grade.id} value={grade.id}>
+                                {grade.name}
+                            </Select.Option>
+                        ))}
+                    </Select>
+                </Col>
                 <Col span={12} style={{ textAlign: 'right' }}>
                     <Button type="default" onClick={showModal} style={{ marginLeft: '' }}>
                         Thêm
@@ -130,7 +148,7 @@ export default function SchoolProgram() {
                                 </Select>
                             </Form.Item>
                             <Form.Item
-                                label="Danh sách môn"
+                                label="Môn học"
                                 name="schoolYearSubjectId"
                                 rules={[{ required: true, message: 'Vui lòng chọn một năm học!' }]}
                             >
@@ -166,8 +184,13 @@ export default function SchoolProgram() {
             </Row>
             <Table dataSource={schoolProgram} rowKey="id" className=' text-black dark:text-white'>
                 <Table.Column title="Id" dataIndex="id" />
-                <Table.Column title="Môn học" dataIndex="schoolYearSubjectId" />
-                <Table.Column title="Khối" dataIndex="gradeId" />
+                <Table.Column title="Môn học" dataIndex="schoolYearSubject"
+                    render={(text, record: SubjectProgram) =>
+                        `${record.schoolYearSubject.subject.name}`} />
+                <Table.Column title="Khối" dataIndex="grade"
+                    render={(text, record: SubjectProgram) =>
+                        `${record.grade.name}`}
+                />
                 <Table.Column title="Số tiết" dataIndex="number" />
             </Table>
         </div>

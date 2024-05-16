@@ -88,15 +88,49 @@ export interface SchoolYearTeacherData {
   };
 }
 
+export interface SubjectProgram {
+  id: number;
+  number: number;
+  sem: string;
+  grade: {
+    id: number;
+    name: string;
+  };
+  schoolYearSubject: {
+    id: number;
+    subject: {
+      id: number;
+      code: string;
+      type: string;
+      name: string;
+    };
+    schoolYear: {
+      id: number;
+      startSem1: string;
+      startSem2: string;
+      end: string;
+    };
+  };
+}
 
 export interface SchoolYearClassData {
   id: number;
-  gradeId: string;
-  schoolYearId: string;
-  teacherSchoolYearId: string;
-  roomId: string;
   className: string;
   classCode: string;
+  grade: {
+    id: number;
+    name: string;
+  };
+  room: {
+    id: number;
+    name: string;
+  };
+  teacherSchoolYear: {
+    id: number;
+    teacher: {
+      sortName: string;
+    }
+  }
 }
 
 export interface SchoolYearSubjectResponse {
@@ -115,13 +149,13 @@ export interface SchoolYearSubjectResponse {
   };
 }
 
-export interface ProgramData {
-  id: number;
-  schoolYearSubjectId: string;
-  gradeId: string;
-  number: number;
-  sem: string;
-}
+// export interface ProgramData {
+//   id: number;
+//   schoolYearSubjectId: string;
+//   gradeId: string;
+//   number: number;
+//   sem: string;
+// }
 
 export interface GradeData {
   id: number;
