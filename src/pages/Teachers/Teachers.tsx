@@ -5,11 +5,7 @@ import Breadcrumb from '../../components/Breadcrumb';
 import mainAxios from '../../apis/main-axios';
 import { TeacherData } from '../../types/response'
 import Loader from '../../common/Loader';
-const options = [
-    { value: '1A1', label: '1A1' },
-    { value: '1A2', label: '1A2' },
-    { value: '1A3', label: '1A3' },
-];
+
 
 interface Role {
     id: number,

@@ -4,6 +4,7 @@ import axios from 'axios';
 import mainAxios from '../../apis/main-axios';
 import teacherApi from '../../apis/urlApi';
 import { GradeData, SchoolYearSubjectResponse, SubjectProgram } from '../../types/response';
+import Loader from '../../common/Loader';
 
 
 export default function SchoolProgram() {
@@ -12,7 +13,7 @@ export default function SchoolProgram() {
     const [form] = Form.useForm();
     const [grades, setGrades] = useState<GradeData[]>([]);
     const [schoolYearSubjects, setSchoolYearSubjects] = useState<SchoolYearSubjectResponse[]>([]);
-
+    const [isLoading, setIsLoading] = useState(true);
     const [defaultGradeId, setDefaultGradeId] = useState<number | undefined>();
 
 
@@ -31,8 +32,10 @@ export default function SchoolProgram() {
         mainAxios.get(`/api/v1/school/school-year-subject-grade?gradeId=${value}`)
             .then(response => {
                 setSchoolProgram(response.data);
+                setIsLoading(false);
             })
             .catch(error => {
+                setIsLoading(false);
                 console.error('Error fetching data:', error);
             });
     };
@@ -94,105 +97,110 @@ export default function SchoolProgram() {
 
     return (
         <div className='p-4 md:p-6 2xl:p-10'>
-            <Row style={{ marginBottom: '15px' }}>
-                <Col span={12}>
-                    <Select
-                        className='w-30'
-                        onChange={handleChangeGrade}
-                        defaultValue={1}
-                    >
-                        {grades.map(grade => (
-                            <Select.Option key={grade.id} value={grade.id}>
-                                {grade.name}
-                            </Select.Option>
-                        ))}
-                    </Select>
-                </Col>
-                <Col span={12} style={{ textAlign: 'right' }}>
-                    <Button type="default" onClick={showModal} style={{ marginLeft: '' }}>
-                        Thêm
-                    </Button>
-                    <Modal
-                        title="Thêm chương trình học"
-                        visible={isModalOpen}
-                        onCancel={handleCancel}
-                        footer={[
-                            <Button key="back" onClick={handleCancel}>
-                                Hủy
-                            </Button>,
-                            <Button key="submit" type="primary" onClick={handleSubmit}>
-                                Gửi
-                            </Button>,
-                        ]}
-                    >
-                        <Form
-                            form={form}
-                            name="addSchoolProgramForm"
-                            labelCol={{ flex: '110px' }}
-                            labelAlign="left"
-                            labelWrap
-                            wrapperCol={{ flex: 1 }}
-                            colon={false}
-                        >
-                            <Form.Item
-                                label="Khối"
-                                name="gradeId"
-                                rules={[{ required: true, message: 'Vui lòng chọn một khối!' }]}
+            {isLoading ? (
+                <Loader />
+            ) : (
+                <div>
+                    <Row style={{ marginBottom: '15px' }}>
+                        <Col span={12}>
+                            <Select
+                                className='w-30'
+                                onChange={handleChangeGrade}
+                                defaultValue={1}
                             >
-                                <Select>
-                                    {grades.map(grade => (
-                                        <Select.Option key={grade.id} value={grade.id}>
-                                            {grade.name}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-                            <Form.Item
-                                label="Môn học"
-                                name="schoolYearSubjectId"
-                                rules={[{ required: true, message: 'Vui lòng chọn một năm học!' }]}
+                                {grades.map(grade => (
+                                    <Select.Option key={grade.id} value={grade.id}>
+                                        {grade.name}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Col>
+                        <Col span={12} style={{ textAlign: 'right' }}>
+                            <Button type="default" onClick={showModal} style={{ marginLeft: '' }}>
+                                Thêm
+                            </Button>
+                            <Modal
+                                title="Thêm chương trình học"
+                                visible={isModalOpen}
+                                onCancel={handleCancel}
+                                footer={[
+                                    <Button key="back" onClick={handleCancel}>
+                                        Hủy
+                                    </Button>,
+                                    <Button key="submit" type="primary" onClick={handleSubmit}>
+                                        Gửi
+                                    </Button>,
+                                ]}
                             >
-                                <Select>
-                                    {schoolYearSubjects.map(s => (
-                                        <Select.Option key={s.id} value={s.id}>
-                                            {s.subject.name}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-                            <Form.Item
-                                label="Số tiết"
-                                name="number"
-                                rules={[{ required: true, message: 'Vui lòng nhập số!' }]}
-                            >
-                                <Input />
-                            </Form.Item>
-                            <Form.Item
-                                label="Học kỳ"
-                                name="sem"
-                                rules={[{ required: true, message: 'Vui lòng chọn học kỳ!' }]}
-                            >
-                                <Select>
-                                    <Select.Option value="HOC_KI_1">Học kỳ 1</Select.Option>
-                                    <Select.Option value="HOC_KI_2">Học kỳ 2</Select.Option>
-                                    <Select.Option value="CA_NAM">Cả năm</Select.Option>
-                                </Select>
-                            </Form.Item>
-                        </Form>
-                    </Modal>
-                </Col>
-            </Row>
-            <Table dataSource={schoolProgram} rowKey="id" className=' text-black dark:text-white'>
-                <Table.Column title="Id" dataIndex="id" />
-                <Table.Column title="Môn học" dataIndex="schoolYearSubject"
-                    render={(text, record: SubjectProgram) =>
-                        `${record.schoolYearSubject.subject.name}`} />
-                <Table.Column title="Khối" dataIndex="grade"
-                    render={(text, record: SubjectProgram) =>
-                        `${record.grade.name}`}
-                />
-                <Table.Column title="Số tiết" dataIndex="number" />
-            </Table>
+                                <Form
+                                    form={form}
+                                    name="addSchoolProgramForm"
+                                    labelCol={{ flex: '110px' }}
+                                    labelAlign="left"
+                                    labelWrap
+                                    wrapperCol={{ flex: 1 }}
+                                    colon={false}
+                                >
+                                    <Form.Item
+                                        label="Khối"
+                                        name="gradeId"
+                                        rules={[{ required: true, message: 'Vui lòng chọn một khối!' }]}
+                                    >
+                                        <Select>
+                                            {grades.map(grade => (
+                                                <Select.Option key={grade.id} value={grade.id}>
+                                                    {grade.name}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item
+                                        label="Môn học"
+                                        name="schoolYearSubjectId"
+                                        rules={[{ required: true, message: 'Vui lòng chọn một năm học!' }]}
+                                    >
+                                        <Select>
+                                            {schoolYearSubjects.map(s => (
+                                                <Select.Option key={s.id} value={s.id}>
+                                                    {s.subject.name}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item
+                                        label="Số tiết"
+                                        name="number"
+                                        rules={[{ required: true, message: 'Vui lòng nhập số!' }]}
+                                    >
+                                        <Input />
+                                    </Form.Item>
+                                    <Form.Item
+                                        label="Học kỳ"
+                                        name="sem"
+                                        rules={[{ required: true, message: 'Vui lòng chọn học kỳ!' }]}
+                                    >
+                                        <Select>
+                                            <Select.Option value="HOC_KI_1">Học kỳ 1</Select.Option>
+                                            <Select.Option value="HOC_KI_2">Học kỳ 2</Select.Option>
+                                            <Select.Option value="CA_NAM">Cả năm</Select.Option>
+                                        </Select>
+                                    </Form.Item>
+                                </Form>
+                            </Modal>
+                        </Col>
+                    </Row>
+                    <Table dataSource={schoolProgram} rowKey="id" className=' text-black dark:text-white'>
+                        <Table.Column title="Môn học" dataIndex="schoolYearSubject"
+                            render={(text, record: SubjectProgram) =>
+                                `${record.schoolYearSubject.subject.name}`} />
+                        <Table.Column title="Khối" dataIndex="grade"
+                            render={(text, record: SubjectProgram) =>
+                                `${record.grade.name}`}
+                        />
+                        <Table.Column title="Số tiết" dataIndex="number" />
+                    </Table>
+                </div>
+            )}
         </div>
     );
 }

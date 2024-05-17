@@ -250,3 +250,17 @@ export interface Student {
     }[]
   }
 }
+
+export interface Lesson {
+  id: number;
+  indexLesson: number;
+  studyTime: string;
+  dayOfWeek: string;
+  note: string | null;
+  teacherSchoolYearId: number;
+  schoolYearClassId: number;
+  schoolYearSubjectId: number;
+  teacherName: string;
+  className: string;
+  subjectName: string;
+}

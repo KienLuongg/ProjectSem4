@@ -107,16 +107,16 @@ const Header = (props: {
               </div>
             </form>
           </div>
-          <div style={{ marginRight: "14px" }}>
+          <div className='pl-132.5'>
             <Select
-              style={{ width: "117px", height: "38px" }}
+              className='w-35'
               options={optionsYear}
               value={idYear}
               onChange={handleChange}
             />
           </div>
           <div className="flex items-center gap-3 2xsm:gap-7">
-            <DarkModeSwitcher />
+            {/* <DarkModeSwitcher /> */}
             <DropdownUser />
           </div>
         </div>
