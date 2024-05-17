@@ -1,5 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Button, Col, Row, Form, Input, Table, Modal, DatePicker, message } from 'antd';
+import {
+  Button,
+  Col,
+  Row,
+  Form,
+  Input,
+  Table,
+  Modal,
+  DatePicker,
+  message,
+} from 'antd';
 import moment from 'moment';
 import mainAxios from '../../apis/main-axios';
 import Loader from '../../common/Loader';
@@ -18,12 +28,13 @@ export default function SchoolYears() {
 
   const fetchData = () => {
     setIsLoading(true);
-    mainAxios.get('/api/v1/school/school-year')
-      .then(response => {
+    mainAxios
+      .get('/api/v1/school/school-year')
+      .then((response) => {
         setSchoolYears(response.data);
         setIsLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching data:', error);
         setIsLoading(false);
       });
@@ -40,9 +51,9 @@ export default function SchoolYears() {
   const handleSubmit = async () => {
     try {
       const formData = await form.validateFields();
-      console.log(formData);
+
       const res = await teacherApi.postCreateSchoolYear(formData);
-      console.log('Data submitted:', res.data);
+
       setIsModalOpen(false);
       fetchData();
       message.success('Data submitted successfully!');
@@ -66,7 +77,11 @@ export default function SchoolYears() {
         <>
           <Row className="mb-4">
             <Col span={12}>
-              <Input type="text" placeholder="Tìm theo năm" className="w-full md:w-3/4" />
+              <Input
+                type="text"
+                placeholder="Tìm theo năm"
+                className="w-full md:w-3/4"
+              />
             </Col>
             <Col span={12} className="text-right">
               <Button type="default" onClick={showModal} className="">
@@ -94,21 +109,33 @@ export default function SchoolYears() {
                   <Form.Item
                     label="Thời gian bắt đầu học kỳ I:"
                     name="startSem1"
-                    rules={[{ required: true, message: 'Please input start date for semester 1!' }]}
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please input start date for semester 1!',
+                      },
+                    ]}
                   >
                     <DatePicker className="w-full" />
                   </Form.Item>
                   <Form.Item
                     label="Thời gian bắt đầu học kỳ II:"
                     name="startSem2"
-                    rules={[{ required: true, message: 'Please input start date for semester 2!' }]}
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please input start date for semester 2!',
+                      },
+                    ]}
                   >
                     <DatePicker className="w-full" />
                   </Form.Item>
                   <Form.Item
                     label="Thời gian kết thúc:"
                     name="end"
-                    rules={[{ required: true, message: 'Please input end date!' }]}
+                    rules={[
+                      { required: true, message: 'Please input end date!' },
+                    ]}
                   >
                     <DatePicker className="w-full" />
                   </Form.Item>
@@ -116,7 +143,11 @@ export default function SchoolYears() {
               </Modal>
             </Col>
           </Row>
-          <Table dataSource={schoolYears} rowKey="id" className=' text-black dark:text-white'>
+          <Table
+            dataSource={schoolYears}
+            rowKey="id"
+            className=" text-black dark:text-white"
+          >
             <Table.Column title="Id" dataIndex="id" />
             <Table.Column
               title="Học kỳ 1"

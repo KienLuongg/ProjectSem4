@@ -6,9 +6,7 @@ const baseURL = 'http://222.252.108.8:4869';
 
 const mainAxios = axios.create({
   baseURL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
 mainAxios.interceptors.request.use(
@@ -21,7 +19,7 @@ mainAxios.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  } // Remove the comma here
 );
 
 // Thêm interceptor để xử lý refresh token
@@ -41,9 +39,10 @@ mainAxios.interceptors.response.use(
         const refreshToken = getCookie(Storage.refresh_token);
         const refreshResponse = await mainAxios.post(
           '/api/v1/auth/refresh-token',
-          { refresh_token: refreshToken }
+          {
+            token: refreshToken,
+          }
         );
-        console.log(refreshResponse)
 
         // Cập nhật token mới và refresh token trong cookie
         setCookie(Storage.token, refreshResponse.data.token);
@@ -64,9 +63,6 @@ mainAxios.interceptors.response.use(
 
     return Promise.reject(error);
   }
-
-
-
 );
 
 export default mainAxios;

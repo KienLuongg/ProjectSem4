@@ -10,7 +10,6 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 const SignIn = () => {
   const login = useSelector((state: RootState) => state.isLogin.isLogin);
-  console.log(login);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -42,7 +41,7 @@ const SignIn = () => {
       //   formData
       // );
       const response = await mainAxios.post('/api/v1/auth/login', formData);
-      // console.log(response);
+
       notification.success({
         message: 'Login success',
       });
@@ -84,7 +83,6 @@ const SignIn = () => {
           {/* Logo */}
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
-
               <img
                 className="hidden dark:block"
                 src="http://www.schooladmin.io/images/main-logo.png"
@@ -95,7 +93,6 @@ const SignIn = () => {
                 src="http://www.schooladmin.io/images/main-logo.png"
                 alt="Logo"
               />
-
 
               <p className="2xl:px-20">Cùng Trải Nghiệm Thống</p>
               <span className="mt-15 inline-block">
