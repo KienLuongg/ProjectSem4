@@ -2,11 +2,13 @@ import { IResponse } from '../types/response';
 import mainAxios from './main-axios';
 
 enum URL {
+  // teacher
   GET_TEACHER = '/api/v1/teacher',
   POST_TEACHER = '/api/v1/teacher',
   PUT_TEACHER = '/api/v1/teacher',
-  DELETE_TEACHER = '//api/v1/teacher',
+  DELETE_TEACHER = '/api/v1/teacher',
   CREATE_TEACHER_SCHOOL_YEAR = '/api/v1/school/creat-teacher-school-year',
+  //school
   CREATE_SCHOOL_YEAR_SUBJECT = '/api/v1/school/creat-school-year_subject',
   CREATE_SCHOOL_YEAR = '/api/v1/school/creat-school-year',
   CREATE_SCHOOL_YEAR_CLASS = '/api/v1/school/creat-school-year-class',
@@ -18,6 +20,8 @@ enum URL {
   GET_SUBJECTS = '/api/v1/school/subject',
   GET_GRADES = '/api/v1/school/get-grades',
   GET_ROOMS = '/api/v1/school/get-rooms',
+  //students
+  GET_STUDENTS_YEARS = '/api/v1/student/get-student-year-info-by',
 }
 
 const teacherApi = {
@@ -80,17 +84,14 @@ const teacherApi = {
   getSchoolYearById: (id: number): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_SCHOOL_YEAR}/${id}`);
   },
-  getTeacherSchoolYear: (): Promise<IResponse<any>> => {
-    const getSchoolYearId = localStorage.getItem("idYear")
-    return mainAxios.get(`${URL.GET_TEACHER_SCHOOL_YEAR}?schoolYearId=${getSchoolYearId}`);
+  getTeacherSchoolYear: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_TEACHER_SCHOOL_YEAR}?schoolYearId=${id}`);
   },
-  getSchoolYearSubject: (): Promise<IResponse<any>> => {
-    const getSchoolYearId = localStorage.getItem("idYear")
-    return mainAxios.get(`${URL.GET_SCHOOL_YEAR_SUBJECT}?schoolYearId=${getSchoolYearId}`);
+  getSchoolYearSubject: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_SCHOOL_YEAR_SUBJECT}?schoolYearId=${id}`);
   },
-  getSchoolYearClass: (): Promise<IResponse<any>> => {
-    const getSchoolYearId = localStorage.getItem("idYear")
-    return mainAxios.get(`${URL.GET_SCHOOL_YEAR_CLASS}?schoolYearId=${getSchoolYearId}`);
+  getSchoolYearClass: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_SCHOOL_YEAR_CLASS}?schoolYearId=${id}`);
   },
   getGrades: (): Promise<IResponse<any>> => {
     return mainAxios.get(URL.GET_GRADES);
@@ -101,6 +102,9 @@ const teacherApi = {
   getSubjectById: (id?: number): Promise<IResponse<any>> => {
     const url = id ? `${URL.GET_SUBJECTS}?id=${id}` : URL.GET_SUBJECTS;
     return mainAxios.get(url);
+  },
+  getStudents: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_STUDENTS_YEARS}?bySchoolYearId=${id}`);
   },
 };
 export default teacherApi;

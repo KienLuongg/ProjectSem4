@@ -7,14 +7,17 @@ import App from './App';
 import './style/mainStyle.css';
 import './index.css';
 import './satoshi.css';
+import YearProvider from './context/YearProvider/YearProvider';
 
 ReactDOM.render(
   <React.StrictMode>
     {/* Wrap your App component with Provider and pass the store */}
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <YearProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </YearProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

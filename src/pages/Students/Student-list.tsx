@@ -11,31 +11,35 @@ import {
   DatePicker,
   message,
 } from 'antd';
-import { useEffect, useState } from 'react';
-import Breadcrumb from '../../components/Breadcrumb';
-import axios from 'axios';
-import teacherApi from '../../apis/urlApi';
+import { useContext, useEffect, useState } from 'react';
 import mainAxios from '../../apis/main-axios';
 import { Student } from '../../types/response';
-
-
+import teacherApi from '../../apis/urlApi';
+import { YearContext } from '../../context/YearProvider/YearProvider';
+import Loader from '../../common/Loader';
 
 export default function Students() {
   const [students, setStudents] = useState<Student[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [form] = Form.useForm();
-  const getYear = localStorage.getItem('idYear');
+  const { idYear } = useContext(YearContext);
 
   useEffect(() => {
-    mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearId=${getYear}`)
-      .then((response) => {
-        setStudents(response.data);
-        console.log('Fetched students:', response.data); // Log fetched students
-      })
-      .catch((error) => {
-        // Handle error
-        console.error('Error fetching data:', error);
-      });
-  }, []);
+    const fetchStudents = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getStudents(idYear);
+        setStudents(res.data);
+      } catch (error) {
+        console.error('Failed to fetch students:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, [idYear]);
 
   // Hàm để mở modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,11 +55,11 @@ export default function Students() {
   const handleSubmit = async () => {
     try {
       const formData = await form.validateFields();
-      console.log(formData);
-      const res = await mainAxios.post('/api/v1/student', formData);
-      console.log('Data submitted:', res.data);
-      setIsModalOpen(false);
 
+      const res = await mainAxios.post('/api/v1/student', formData);
+      console.log(res);
+
+      setIsModalOpen(false);
     } catch (error: any) {
       if (error.response) {
         console.error('Server Error:', error.response.data);
@@ -70,19 +74,13 @@ export default function Students() {
 
   const renderStudentStatuses = (text: any, record: Student) => {
     return record.students.studentStatuses
-      .map(status => status.description)
+      .map((status) => status.description)
       .join(', ');
   };
 
   return (
-    <div className='p-4 md:p-6 2xl:p-10'>
-
-
-      <Button
-        type="default"
-        onClick={showModal}
-        className='mb-4'
-      >
+    <div className="p-4 md:p-6 2xl:p-10">
+      <Button type="default" onClick={showModal} className="mb-4">
         Thêm
       </Button>
       <Modal
@@ -158,7 +156,8 @@ export default function Students() {
               rules={[{ required: true, message: 'Please input!' }]}
             >
               <Input />
-            </Form.Item><Form.Item
+            </Form.Item>
+            <Form.Item
               label="Năm:"
               name="schoolYearClassId"
               rules={[{ required: true, message: 'Please input!' }]}
@@ -170,46 +169,41 @@ export default function Students() {
       </Modal>
 
       {/* Bảng hiển thị danh sách học sinh */}
-      <Table dataSource={students} rowKey="id">
-        <Table.Column
-          title="Mã học sinh"
-          render={(text, record: Student) =>
-            `${record.students.studentCode}`
-          }
-        />
-        <Table.Column
-          title="Họ và tên"
-          render={(text, record: Student) =>
-            `${record.students.firstName} ${record.students.lastName}`
-          }
-        />
-        <Table.Column
-          title="Ngày sinh"
-          render={(text, record: Student) => {
-            const date = new Date(record.students.birthday);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
-          }}
-        />
-        <Table.Column
-          title="Giới tính"
-          render={(text, record: Student) =>
-            `${record.students.studentCode}`
-          }
-        />
-        <Table.Column
-          title="Địa chỉ"
-          render={(text, record: Student) =>
-            `${record.students.address}`
-          }
-        />
-        <Table.Column
-          title="Trạng thái"
-          render={renderStudentStatuses}
-        />
-      </Table>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <Table dataSource={students} rowKey="id">
+          <Table.Column
+            title="Mã học sinh"
+            render={(text, record: Student) => `${record.students.studentCode}`}
+          />
+          <Table.Column
+            title="Họ và tên"
+            render={(text, record: Student) =>
+              `${record.students.firstName} ${record.students.lastName}`
+            }
+          />
+          <Table.Column
+            title="Ngày sinh"
+            render={(text, record: Student) => {
+              const date = new Date(record.students.birthday);
+              const day = String(date.getDate()).padStart(2, '0');
+              const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+              const year = date.getFullYear();
+              return `${day}/${month}/${year}`;
+            }}
+          />
+          <Table.Column
+            title="Giới tính"
+            render={(text, record: Student) => `${record.students.studentCode}`}
+          />
+          <Table.Column
+            title="Địa chỉ"
+            render={(text, record: Student) => `${record.students.address}`}
+          />
+          <Table.Column title="Trạng thái" render={renderStudentStatuses} />
+        </Table>
+      )}
     </div>
   );
 }

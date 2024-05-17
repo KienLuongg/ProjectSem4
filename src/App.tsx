@@ -17,7 +17,7 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const token = getCookie(Storage.token);
-  console.log(token);
+
   useEffect(() => {
     setLoading(false);
     if (!token) {
