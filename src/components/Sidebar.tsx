@@ -252,6 +252,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Môn học
                             </NavLink>
                           </li>
+
+                          <li>
+                            <NavLink
+                              to="/school-year-teachers"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Cán bộ giáo viên
+                            </NavLink>
+                          </li>
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}
@@ -325,20 +337,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Thời khoá biểu
                             </NavLink>
                           </li>
-
-                          {/* <li>
-                            <NavLink
-                              to=""
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              Lịch báo giảng
-                            </NavLink>
-                          </li> */}
-
-
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}

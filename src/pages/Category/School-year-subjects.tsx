@@ -3,10 +3,8 @@ import { Button, Form, message, Modal, Select, Table } from 'antd';
 import teacherApi from '../../apis/urlApi';
 import {
     SchoolYearSubjectResponse,
-    SchoolYearsData,
     Subjects,
 } from '../../types/response';
-import { data } from 'jquery';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
 
@@ -18,16 +16,28 @@ export default function SchoolYearSubject() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = React.useState(true);
+    const { idYear } = useContext(YearContext);
+
     useEffect(() => {
-        fetchData();
         fetchSubjects();
     }, []);
 
-    const fetchData = () => {
-        teacherApi.getSchoolYearSubject()
-            .then((response) => setSchoolYearSubject(response.data))
-            .catch((error) => console.error('Error fetching data:', error));
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            if (idYear === null) return;
+            setIsLoading(true);
+            try {
+                const res = await teacherApi.getSchoolYearSubject(idYear);
+                setSchoolYearSubject(res.data);
+            } catch (error) {
+                console.error('Failed to fetch students:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [idYear]);
+
 
     const fetchSubjects = () => {
         teacherApi
@@ -39,7 +49,7 @@ export default function SchoolYearSubject() {
     const showModal = () => setIsModalOpen(true);
 
     const handleCancel = () => setIsModalOpen(false);
-    const { idYear } = useContext(YearContext);
+
     // const getSchoolYearId = localStorage.getItem('idYear');
 
     const handleSubmit = async () => {
@@ -77,44 +87,46 @@ export default function SchoolYearSubject() {
                         </Button>,
                     ]}
                 >
-                    {isLoading ? (
-                        <Loader />
-                    ) : (
-                        <Form
-                            form={form}
-                            name="addSchoolYearSubjectForm"
-                            labelCol={{ span: 6 }}
-                            wrapperCol={{ span: 18 }}
+
+                    <Form
+                        form={form}
+                        name="addSchoolYearSubjectForm"
+                        labelCol={{ span: 6 }}
+                        wrapperCol={{ span: 18 }}
+                    >
+                        <Form.Item
+                            label="Môn học"
+                            name="subjectIds"
+                            rules={[{ required: true, message: 'Vui lòng chọn môn học!' }]}
                         >
-                            <Form.Item
-                                label="Môn học"
-                                name="subjectIds"
-                                rules={[{ required: true, message: 'Vui lòng chọn môn học!' }]}
-                            >
-                                <Select mode="multiple">
-                                    {subjects.map((subject) => (
-                                        <Select.Option key={subject.id} value={subject.id}>
-                                            {subject.name}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-                        </Form>
-                    )}
+                            <Select mode="multiple">
+                                {subjects.map((subject) => (
+                                    <Select.Option key={subject.id} value={subject.id}>
+                                        {subject.name}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                    </Form>
+
                 </Modal>
             </div>
-            <Table
-                dataSource={schoolYearSubject}
-                rowKey="id"
-                className="text-black dark:text-white"
-            >
-                <Table.Column title="Id" dataIndex="id" />
-                <Table.Column
-                    title="Môn học"
-                    dataIndex="subject"
-                    render={(subject: { name: string }) => subject.name}
-                />
-            </Table>
+            {isLoading ? (
+                <Loader />
+            ) : (
+                <Table
+                    dataSource={schoolYearSubject}
+                    rowKey="id"
+                    className="text-black dark:text-white"
+                >
+                    <Table.Column title="Id" dataIndex="id" />
+                    <Table.Column
+                        title="Môn học"
+                        dataIndex="subject"
+                        render={(subject: { name: string }) => subject.name}
+                    />
+                </Table>
+            )};
         </div>
     );
 }

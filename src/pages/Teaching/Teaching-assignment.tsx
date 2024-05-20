@@ -1,229 +1,97 @@
-import { SearchOutlined } from '@ant-design/icons';
-import type { InputRef } from 'antd';
-import { Breadcrumb, Button, Col, Input, Row, Space, Table } from 'antd';
-import type { ColumnsType, ColumnType } from 'antd/es/table';
-import type { FilterConfirmProps } from 'antd/es/table/interface';
-import React, { useRef, useState } from 'react';
-import Highlighter from 'react-highlight-words';
+import React, { useContext, useEffect, useState } from 'react';
+import { Breadcrumb, Button, Col, Form, Row, Table, message } from 'antd';
 import { NavLink } from 'react-router-dom';
+import teacherApi from '../../apis/urlApi';
+import { TeacherClassSubjectData, SchoolYearClassData, SchoolYearSubjectResponse } from '../../types/response';
+import { YearContext } from '../../context/YearProvider/YearProvider';
 
-interface DataType {
-  key: string;
-  name: string;
-  age: number;
-  address: string;
-}
+const AssignmentForm: React.FC = () => {
+  const [form] = Form.useForm();
+  const [teacherClassSubject, setTeacherClassSubject] = useState<TeacherClassSubjectData[]>([]);
+  const { idYear } = useContext(YearContext);
+  const [isLoading, setIsLoading] = useState(true);
+  const [classes, setClasses] = useState<SchoolYearClassData[]>([]);
+  const [subjects, setSubjects] = useState<SchoolYearSubjectResponse[]>([]);
+  const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null);
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
 
-type DataIndex = keyof DataType;
-
-const data: DataType[] = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-  },
-  {
-    key: '2',
-    name: 'Joe Black',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-  },
-  {
-    key: '3',
-    name: 'Jim Green',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-  },
-  {
-    key: '4',
-    name: 'Jim Red',
-    age: 32,
-    address: 'London No. 2 Lake Park',
-  },
-];
-
-const App: React.FC = () => {
-  const [searchText, setSearchText] = useState('');
-  const [searchedColumn, setSearchedColumn] = useState('');
-  const searchInput = useRef<InputRef>(null);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex
-  ) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-  };
-
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    setSearchText('');
-  };
-
-  const getColumnSearchProps = (
-    dataIndex: DataIndex
-  ): ColumnType<DataType> => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-      close,
-    }) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={`${selectedKeys[0] || ''}`}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() =>
-            handleSearch(selectedKeys as string[], confirm, dataIndex)
-          }
-          style={{ marginBottom: 8, display: 'block' }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() =>
-              handleSearch(selectedKeys as string[], confirm, dataIndex)
-            }
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              confirm({ closeDropdown: false });
-              setSearchText((selectedKeys as string[])[0]);
-              setSearchedColumn(dataIndex);
-            }}
-          >
-            Filter
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              close();
-            }}
-          >
-            close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase()),
-    onFilterDropdownOpenChange: (visible) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getTeacherSchoolYearClassSubject(idYear);
+        setTeacherClassSubject(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch students:', error);
+      } finally {
+        setIsLoading(false);
       }
-    },
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ''}
-        />
-      ) : (
-        text
-      ),
-  });
+    };
+    fetchTeachers();
+  }, [idYear]);
 
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    setSelectedRowKeys(newSelectedRowKeys);
+  useEffect(() => {
+    const fetchClasses = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setClasses(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch students:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchClasses();
+  }, [idYear]);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getSchoolYearSubject(idYear);
+        setSubjects(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch subjects:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSubjects();
+  }, [idYear]);
+
+  const handleTeacherClick = (teacherId: number) => {
+    setSelectedTeacher(String(teacherId));
   };
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
+  const handleClassChange = (classId: number) => {
+    setSelectedClass(String(classId));
   };
 
-  const columns: ColumnsType<DataType> = [
-    {
-      title: 'Giáo viên',
-      dataIndex: 'name',
-      key: 'name',
-      width: '200',
+  const handleSubjectsChange = (subjectIds: number[]) => {
+    setSelectedSubjects(subjectIds.map(String));
+  };
 
-      ...getColumnSearchProps('name'),
-    },
-    {
-      title: 'Chủ nhiệm',
-      dataIndex: 'assignment',
-      key: '',
-      width: '200',
-      ...getColumnSearchProps('age'),
-    },
-    {
-      title: 'Phân công giảng dạy',
-      dataIndex: 'assignment',
-      key: '',
-      width: '200',
-      ...getColumnSearchProps('age'),
-    },
-  ];
-
-  const column1: any = [
-    {
-      title: 'Lớp',
-      dataIndex: '',
-      key: '',
-      width: '20px',
-      filters: [
-        {
-          text: 'London',
-          value: 'London',
-        },
-        {
-          text: 'New York',
-          value: 'New York',
-        },
-      ],
-      onFilter: (value: string, record: { address: string | string[] }) =>
-        record.address.indexOf(value as string) === 0,
-    },
-  ];
-
-  const column2: any = [
-    {
-      title: '',
-    },
-    {
-      title: 'Môn học',
-      dataIndex: '',
-      key: '',
-      width: '95%',
-    },
-  ];
+  const handleSubmit = async () => {
+    try {
+      const formData = await form.validateFields();
+      formData['schoolYearId'] = idYear;
+      const res = await teacherApi.postTeacherClassSubject(formData);
+      message.success('Data submitted successfully!');
+    } catch (error: any) {
+      if (error.response) console.error('Server Error:', error.response.data);
+      else if (error.request) console.error('Network Error:', error.request);
+      else console.error('Error:', error.message);
+      message.error('Failed to submit data. Please try again later.');
+    }
+  };
 
   return (
-    <div className="p-4 md:p-6 2xl:p-1">
+    <div className="p-4 md:p-6 2xl:p-10">
       <Breadcrumb className="mb-4">
         <Breadcrumb.Item className="text-3xl text-black">
           Phân công giảng dạy
@@ -236,24 +104,57 @@ const App: React.FC = () => {
         >
           Quay lại
         </NavLink>
-        <Button className="px-8 bg-blue text-white">Lưu</Button>
+        <Button onClick={handleSubmit} className="px-8 bg-blue text-white">Lưu</Button>
       </Row>
-      <Row>
-        <Col span={10} className="mr-4 w-1/2">
-          <Table columns={columns} className="mb-4" />
-        </Col>
-        <Col span={4} className="mr-4 w-1/4">
-          <Table columns={column1} className="mb-4" />
-        </Col>
-        <Col span={9} className="w-1/4">
+      <Row className='flex'>
+        <Col span={8} className="">
           <Table
-            columns={column2}
-            className="mb-4"
-            rowSelection={rowSelection}
-          />
+            dataSource={teacherClassSubject}
+            rowKey="id"
+            onRow={(record) => ({
+              onClick: () => handleTeacherClick(record.teacherSchoolYear.id),
+              style: { cursor: 'pointer' },
+            })}
+            rowClassName={(record) => (selectedTeacher !== null && record.teacherSchoolYear.id === +selectedTeacher ? 'bg-blue-100' : '')}
+          >
+            <Table.Column title="Giáo viên" render={(text, record: TeacherClassSubjectData) => (
+              <span>{record.teacherSchoolYear.teacher.sortName}</span>
+            )} />
+          </Table>
+        </Col>
+        <Col span={8} className="">
+          <Table
+            dataSource={classes}
+            rowKey="id"
+            onRow={(record) => ({
+              onClick: () => handleClassChange(record.id),
+              style: { cursor: 'pointer' },
+            })}
+            rowClassName={(record) => (record.id === selectedClass ? 'bg-blue-100' : '')}
+          >
+            <Table.Column title="Lớp" dataIndex="className" />
+          </Table>
+        </Col>
+        <Col span={8}>
+          <Table
+            dataSource={subjects}
+            rowKey="id"
+            rowSelection={{
+              type: 'checkbox',
+              onChange: (selectedRowKeys: React.Key[], selectedRows: SchoolYearSubjectResponse[]) => {
+                handleSubjectsChange(selectedRowKeys as number[]);
+              },
+              selectedRowKeys: selectedSubjects,
+            }}
+          >
+            <Table.Column title="Môn học" render={(text, record: SchoolYearSubjectResponse) => (
+              <span>{record.subject.name}</span>
+            )} />
+          </Table>
         </Col>
       </Row>
     </div>
   );
 };
-export default App;
+
+export default AssignmentForm;

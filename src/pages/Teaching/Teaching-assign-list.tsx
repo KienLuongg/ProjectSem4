@@ -1,206 +1,42 @@
-import { SearchOutlined } from '@ant-design/icons';
-import type { InputRef, RadioChangeEvent } from 'antd';
 import {
   Breadcrumb,
-  Button,
   Col,
-  Input,
   Radio,
   Row,
   Select,
   Space,
   Table,
 } from 'antd';
-import type { ColumnsType, ColumnType } from 'antd/es/table';
-import type { FilterConfirmProps } from 'antd/es/table/interface';
-import React, { useRef, useState } from 'react';
-import Highlighter from 'react-highlight-words';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-
-interface DataType {
-  key: string;
-  name: string;
-  age: number;
-  address: string;
-}
-
-type DataIndex = keyof DataType;
-
-const data: DataType[] = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-  },
-  {
-    key: '2',
-    name: 'Joe Black',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-  },
-  {
-    key: '3',
-    name: 'Jim Green',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-  },
-  {
-    key: '4',
-    name: 'Jim Red',
-    age: 32,
-    address: 'London No. 2 Lake Park',
-  },
-];
+import { YearContext } from '../../context/YearProvider/YearProvider';
+import teacherApi from '../../apis/urlApi';
+import { TeacherClassSubjectData } from '../../types/response';
+import { render } from 'react-dom';
+import Loader from '../../common/Loader';
 
 const App: React.FC = () => {
-  const [searchText, setSearchText] = useState('');
-  const [searchedColumn, setSearchedColumn] = useState('');
-  const searchInput = useRef<InputRef>(null);
+  const [teacherClassSubject, setTeacherClassSubject] = useState<TeacherClassSubjectData[]>([]);
+  const { idYear } = useContext(YearContext);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex
-  ) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-  };
-
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    setSearchText('');
-  };
-
-  const getColumnSearchProps = (
-    dataIndex: DataIndex
-  ): ColumnType<DataType> => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-      close,
-    }) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={`${selectedKeys[0] || ''}`}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() =>
-            handleSearch(selectedKeys as string[], confirm, dataIndex)
-          }
-          style={{ marginBottom: 8, display: 'block' }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() =>
-              handleSearch(selectedKeys as string[], confirm, dataIndex)
-            }
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              confirm({ closeDropdown: false });
-              setSearchText((selectedKeys as string[])[0]);
-              setSearchedColumn(dataIndex);
-            }}
-          >
-            Filter
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              close();
-            }}
-          >
-            close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase()),
-    onFilterDropdownOpenChange: (visible) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getTeacherSchoolYearClassSubject(idYear);
+        setTeacherClassSubject(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch students:', error);
+      } finally {
+        setIsLoading(false);
       }
-    },
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ''}
-        />
-      ) : (
-        text
-      ),
-  });
+    };
+    fetchData();
+  }, [idYear]);
 
-  const columns: ColumnsType<DataType> = [
-    {
-      title: 'Giáo viên',
-      dataIndex: 'name',
-      key: 'name',
-      width: '30%',
-      ...getColumnSearchProps('name'),
-    },
-    {
-      title: 'Chủ nhiệm',
-      dataIndex: 'assignment',
-      key: '',
-      width: '20%',
-      ...getColumnSearchProps('age'),
-    },
-    {
-      title: 'Phân công giảng dạy',
-      dataIndex: 'assignment',
-      key: '',
-      width: '20%',
-      ...getColumnSearchProps('age'),
-    },
-    {
-      title: 'Tổng số tiết/tuần',
-      dataIndex: 'address',
-      key: 'address',
-      ...getColumnSearchProps('address'),
-    },
-  ];
 
-  const [value, setValue] = useState(1);
-
-  const onChange = (e: RadioChangeEvent) => {
-    setValue(e.target.value);
-  };
-
-  const onSearch = (value: string) => {};
 
   return (
     <div className="p-4 md:p-6 2xl:p-1">
@@ -217,7 +53,6 @@ const App: React.FC = () => {
               showSearch
               placeholder="Select"
               optionFilterProp="children"
-              onSearch={onSearch}
               options={[
                 {
                   value: 'jack',
@@ -235,7 +70,7 @@ const App: React.FC = () => {
             />
           </Col>
           <Col span={24} className="mb-10">
-            <Radio.Group onChange={onChange} value={value}>
+            <Radio.Group>
               <Space direction="vertical">
                 <Radio value={1}>Tất cả</Radio>
                 <Radio value={2}>Đã phân công</Radio>
@@ -259,7 +94,23 @@ const App: React.FC = () => {
         <Col span={16}>
           <Row>
             <Col span={24}>
-              <Table columns={columns} dataSource={data} className="mb-4" />
+              {isLoading ? (
+                <Loader />
+              ) : (
+                <Table dataSource={teacherClassSubject} loading={isLoading} className="mb-4" >
+                  <Table.Column title="Giáo viên"
+                    render={(text, record: TeacherClassSubjectData) =>
+                      `${record.teacherSchoolYear.teacher.sortName}`} />
+                  <Table.Column title="Phân công giảng dạy"
+                    render={(text, record: TeacherClassSubjectData) =>
+                      record.subjectClassResList.map((subjectClass) => (
+                        <div key={subjectClass.schoolYearSubject.id}>
+                          <b>{subjectClass.schoolYearSubject.subject.name}</b> ({subjectClass.schoolYearClassList.map((cls) => cls.className).join(', ')})
+                        </div>
+                      ))
+                    } />
+                </Table>
+              )}
             </Col>
           </Row>
         </Col>
@@ -268,4 +119,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default App; 

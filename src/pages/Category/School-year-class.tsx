@@ -21,9 +21,7 @@ import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
 
 export default function SchoolYearClass() {
-    const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>(
-        []
-    );
+    const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
     const [grades, setGrades] = useState<GradeData[]>([]);
@@ -31,14 +29,15 @@ export default function SchoolYearClass() {
     const [teacherSchoolYears, setTeacherSchoolYears] = useState<
         SchoolYearTeacherData[]
     >([]);
+    const { idYear } = useContext(YearContext);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         fetchGrades();
         fetchRooms();
     }, []);
 
-    const { idYear } = useContext(YearContext);
-    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
         const fetchData = async () => {
             if (idYear === null) return;
@@ -77,15 +76,17 @@ export default function SchoolYearClass() {
             });
     };
     useEffect(() => {
-        const fetchTeacherSchoolYears = () => {
-            teacherApi
-                .getTeacherSchoolYear(idYear)
-                .then((response) => {
-                    setTeacherSchoolYears(response.data);
-                })
-                .catch((error) => {
-                    console.error('Error fetching teacher school years:', error);
-                });
+        const fetchTeacherSchoolYears = async () => {
+            if (idYear === null) return;
+            setIsLoading(true);
+            try {
+                const res = await teacherApi.getTeacherSchoolYear(idYear);
+                setTeacherSchoolYears(res?.data);
+            } catch (error) {
+                console.error('Failed to fetch students:', error);
+            } finally {
+                setIsLoading(false);
+            }
         };
         fetchTeacherSchoolYears();
     }, [idYear]);
@@ -221,11 +222,12 @@ export default function SchoolYearClass() {
                     </Modal>
                 </Col>
             </Row>
-            <div>
-                <Row justify="space-between" className="mb-6">
-                    {isLoading ? (
-                        <Loader />
-                    ) : (
+            {isLoading ? (
+                <Loader />
+            ) : (
+                <div>
+                    <Row justify="space-between" className="mb-6">
+
                         <Table dataSource={schoolYearClass} rowKey="id" className="w-full">
                             <Table.Column title="STT" dataIndex="id" className="w-1" />
                             <Table.Column title="Tên lớp" dataIndex="className" />
@@ -253,9 +255,10 @@ export default function SchoolYearClass() {
                                 }
                             />
                         </Table>
-                    )}
-                </Row>
-            </div>
+
+                    </Row>
+                </div>
+            )}
         </div>
     );
 }

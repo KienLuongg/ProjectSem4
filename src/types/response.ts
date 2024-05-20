@@ -264,3 +264,77 @@ export interface Lesson {
   className: string;
   subjectName: string;
 }
+
+export interface TeacherClassSubjectData {
+  teacherSchoolYear: {
+    id: number;
+    teacher: {
+      id: number;
+      officerNumber: string;
+      sortName: string;
+      joiningDate: Date;
+      active: boolean;
+      positionId: number | null;
+      departments: string | null;
+      user: string | null;
+    };
+    schoolYear: {
+      id: number;
+      startSem1: Date;
+      startSem2: Date;
+      end: Date;
+    };
+  };
+  subjectClassResList: {
+    schoolYearSubject: {
+      id: number;
+      subject: {
+        id: number;
+        code: string;
+        type: string;
+        name: string;
+      };
+      schoolYear: {
+        id: number;
+        startSem1: Date;
+        startSem2: Date;
+        end: Date;
+      } | null;
+    };
+    schoolYearClassList: {
+      id: number;
+      className: string;
+      classCode: string;
+      grade: {
+        id: number;
+        name: string;
+      };
+      room: string | null;
+      teacherSchoolYear: {
+        id: number;
+        teacher: {
+          id: number;
+          officerNumber: string;
+          sortName: string;
+          joiningDate: Date;
+          active: boolean;
+          positionId: number | null;
+          departments: string | null;
+          user: string | null;
+        };
+        schoolYear: {
+          id: number;
+          startSem1: Date;
+          startSem2: Date;
+          end: Date;
+        };
+      } | null;
+      schoolYear: {
+        id: number;
+        startSem1: Date;
+        startSem2: Date;
+        end: Date;
+      } | null;
+    }[];
+  }[];
+}

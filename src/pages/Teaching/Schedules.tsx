@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Button, Form, Table, Modal, Select, Input } from 'antd';
 import Loader from '../../common/Loader';
 import teacherApi from '../../apis/urlApi';
 import { Lesson, SchoolYearClassData } from '../../types/response';
 import mainAxios from '../../apis/main-axios';
+import { YearContext } from '../../context/YearProvider/YearProvider';
 
 export default function Schedules() {
     const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
@@ -11,6 +12,7 @@ export default function Schedules() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
+    const { idYear } = useContext(YearContext);
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -20,18 +22,22 @@ export default function Schedules() {
         setIsModalOpen(false);
     };
 
-    const fetchClass = () => {
-        setIsLoading(true);
-        teacherApi.getSchoolYearClass()
-            .then(response => {
-                setSchoolYearClass(response?.data);
+
+    useEffect(() => {
+        const fetchClass = async () => {
+            if (idYear === null) return;
+            setIsLoading(true);
+            try {
+                const res = await teacherApi.getSchoolYearClass(idYear);
+                setSchoolYearClass(res?.data);
+            } catch (error) {
+                console.error('Failed to fetch students:', error);
+            } finally {
                 setIsLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setIsLoading(false);
-            });
-    }
+            }
+        };
+        fetchClass();
+    }, [idYear]);
 
     const fetchScheduleData = () => {
         setIsLoading(true);
@@ -48,19 +54,24 @@ export default function Schedules() {
     }
 
     useEffect(() => {
-        fetchClass();
         fetchScheduleData();
     }, []);
+
+    interface RowData {
+        period: string;
+        [key: string]: string | undefined; // Define an index signature
+    }
 
     const transformData = (data: any[]) => {
         const periods = ["1", "2", "3", "4", "5"];
         const days = ["T2", "T3", "T4", "T5", "T6"];
 
         const tableData = periods.map(period => {
-            const rowData = { period };
+            const rowData: RowData = { period };
 
             days.forEach(day => {
                 const lesson = data.find(d => d.indexLesson === parseInt(period) && d.dayOfWeek === day);
+                console.log(lesson)
                 rowData[day.toLowerCase()] = lesson ? lesson.subjectName : '';
             });
 
