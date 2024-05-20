@@ -2,8 +2,9 @@ import axios from 'axios';
 import { getCookie, setCookie } from '../utils/storage/cookie-storage';
 import { Storage } from '../contstants/storage';
 
-const baseURL = 'http://222.252.108.8:4869';
-
+const baseURL = 'http://222.254.14.191';
+const url = process.env.REACT_PUBLIC_BASE_API_URL;
+console.log(url);
 const mainAxios = axios.create({
   baseURL,
   headers: { 'Content-Type': 'application/json' },

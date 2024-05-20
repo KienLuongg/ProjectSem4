@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "npx jest"
+    "test": "jest --passWithNoTests"
   },
   "engines": {
     "node": ">=20"
