@@ -112,7 +112,7 @@ const Header = (props: {
             />
           </div>
           <div className="flex items-center gap-3 2xsm:gap-7">
-            <DarkModeSwitcher />
+            {/* <DarkModeSwitcher /> */}
             <DropdownUser />
           </div>
         </div>

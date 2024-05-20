@@ -1,261 +1,261 @@
 import { useContext, useEffect, useState } from 'react';
 import {
-  Button,
-  Col,
-  Row,
-  Form,
-  Table,
-  Modal,
-  message,
-  Select,
-  Input,
+    Button,
+    Col,
+    Row,
+    Form,
+    Table,
+    Modal,
+    message,
+    Select,
+    Input,
 } from 'antd';
 import teacherApi from '../../apis/urlApi';
 import {
-  GradeData,
-  RoomData,
-  SchoolYearClassData,
-  SchoolYearTeacherData,
+    GradeData,
+    RoomData,
+    SchoolYearClassData,
+    SchoolYearTeacherData,
 } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
 
 export default function SchoolYearClass() {
-  const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>(
-    []
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm();
-  const [grades, setGrades] = useState<GradeData[]>([]);
-  const [rooms, setRooms] = useState<RoomData[]>([]);
-  const [teacherSchoolYears, setTeacherSchoolYears] = useState<
-    SchoolYearTeacherData[]
-  >([]);
+    const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>(
+        []
+    );
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [form] = Form.useForm();
+    const [grades, setGrades] = useState<GradeData[]>([]);
+    const [rooms, setRooms] = useState<RoomData[]>([]);
+    const [teacherSchoolYears, setTeacherSchoolYears] = useState<
+        SchoolYearTeacherData[]
+    >([]);
 
-  useEffect(() => {
-    fetchGrades();
-    fetchRooms();
-  }, []);
+    useEffect(() => {
+        fetchGrades();
+        fetchRooms();
+    }, []);
 
-  const { idYear } = useContext(YearContext);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const fetchData = async () => {
-      if (idYear === null) return;
-      setIsLoading(true);
-      try {
-        const res = await teacherApi.getSchoolYearClass(idYear);
-        setSchoolYearClass(res?.data);
-      } catch (error) {
-        console.error('Failed to fetch students:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    const { idYear } = useContext(YearContext);
+    const [isLoading, setIsLoading] = useState(true);
+    useEffect(() => {
+        const fetchData = async () => {
+            if (idYear === null) return;
+            setIsLoading(true);
+            try {
+                const res = await teacherApi.getSchoolYearClass(idYear);
+                setSchoolYearClass(res?.data);
+            } catch (error) {
+                console.error('Failed to fetch students:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [idYear]);
+
+    const fetchGrades = () => {
+        teacherApi
+            .getGrades()
+            .then((response) => {
+                setGrades(response.data.body);
+            })
+            .catch((error) => {
+                console.error('Error fetching grades:', error);
+            });
     };
-    fetchData();
-  }, [idYear]);
 
-  const fetchGrades = () => {
-    teacherApi
-      .getGrades()
-      .then((response) => {
-        setGrades(response.data.body);
-      })
-      .catch((error) => {
-        console.error('Error fetching grades:', error);
-      });
-  };
-
-  const fetchRooms = () => {
-    teacherApi
-      .getRooms()
-      .then((response) => {
-        setRooms(response.data.body);
-      })
-      .catch((error) => {
-        console.error('Error fetching rooms:', error);
-      });
-  };
-  useEffect(() => {
-    const fetchTeacherSchoolYears = () => {
-      teacherApi
-        .getTeacherSchoolYear(idYear)
-        .then((response) => {
-          setTeacherSchoolYears(response.data);
-        })
-        .catch((error) => {
-          console.error('Error fetching teacher school years:', error);
-        });
+    const fetchRooms = () => {
+        teacherApi
+            .getRooms()
+            .then((response) => {
+                setRooms(response.data.body);
+            })
+            .catch((error) => {
+                console.error('Error fetching rooms:', error);
+            });
     };
-    fetchTeacherSchoolYears();
-  }, [idYear]);
+    useEffect(() => {
+        const fetchTeacherSchoolYears = () => {
+            teacherApi
+                .getTeacherSchoolYear(idYear)
+                .then((response) => {
+                    setTeacherSchoolYears(response.data);
+                })
+                .catch((error) => {
+                    console.error('Error fetching teacher school years:', error);
+                });
+        };
+        fetchTeacherSchoolYears();
+    }, [idYear]);
 
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
 
-  // const getSchoolYearId = parseInt(localStorage.getItem('idYear') ?? '0', 10);
+    // const getSchoolYearId = parseInt(localStorage.getItem('idYear') ?? '0', 10);
 
-  const handleSubmit = async () => {
-    try {
-      const formData = await form.validateFields();
+    const handleSubmit = async () => {
+        try {
+            const formData = await form.validateFields();
 
-      formData['schoolYear'] = idYear;
-      const res = await teacherApi.postCreateSchoolYearClass(formData);
+            formData['schoolYear'] = idYear;
+            const res = await teacherApi.postCreateSchoolYearClass(formData);
 
-      setIsModalOpen(false);
-      // fetchData();
-      message.success('Data submitted successfully!');
-    } catch (error: any) {
-      if (error.response) {
-        console.error('Server Error:', error.response.data);
-      } else if (error.request) {
-        console.error('Network Error:', error.request);
-      } else {
-        console.error('Error:', error.message);
-      }
-      message.error('Failed to submit data. Please try again later.');
-    }
-  };
+            setIsModalOpen(false);
+            // fetchData();
+            message.success('Data submitted successfully!');
+        } catch (error: any) {
+            if (error.response) {
+                console.error('Server Error:', error.response.data);
+            } else if (error.request) {
+                console.error('Network Error:', error.request);
+            } else {
+                console.error('Error:', error.message);
+            }
+            message.error('Failed to submit data. Please try again later.');
+        }
+    };
 
-  return (
-    <div className="container mx-auto p-4 md:p-6 2xl:p-10">
-      <Row justify="space-between" className="mb-6">
-        <Col>
-          <Button type="default" onClick={showModal}>
-            Thêm
-          </Button>
-        </Col>
-        <Col>
-          <Modal
-            title="Thêm lớp"
-            visible={isModalOpen}
-            onCancel={handleCancel}
-            footer={[
-              <Button key="back" onClick={handleCancel}>
-                Hủy
-              </Button>,
-              <Button key="submit" type="primary" onClick={handleSubmit}>
-                Gửi
-              </Button>,
-            ]}
-          >
-            <Form
-              form={form}
-              name="addSchoolYearTeacherForm"
-              labelCol={{ flex: '110px' }}
-              labelAlign="left"
-              labelWrap
-              wrapperCol={{ flex: 1 }}
-              colon={false}
-            >
-              <Form.Item
-                label="Tên lớp"
-                name="className"
-                rules={[
-                  { required: true, message: 'Vui lòng chọn giáo viên!' },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                label="Mã lớp"
-                name="classCode"
-                rules={[{ required: true, message: 'Vui lòng chọn năm học!' }]}
-              >
-                <Input />
-              </Form.Item>
-              {/* Adjusted labels for the following form items */}
-              <Form.Item
-                label="Khối học"
-                name="gradeId"
-                rules={[{ required: true, message: 'Vui lòng chọn khối học!' }]}
-              >
-                <Select>
-                  {grades.map((grade) => (
-                    <Select.Option key={grade.id} value={grade.id}>
-                      {grade.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item
-                label="Phòng học"
-                name="roomId"
-                rules={[
-                  { required: true, message: 'Vui lòng chọn phòng học!' },
-                ]}
-              >
-                <Select>
-                  {rooms.map((room: any) => (
-                    <Select.Option key={room.id} value={room.id}>
-                      {room.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item
-                label="Giáo viên"
-                name="teacherSchoolYear"
-                rules={[
-                  { required: true, message: 'Vui lòng chọn giáo viên!' },
-                ]}
-              >
-                <Select>
-                  {teacherSchoolYears.map((t) => (
-                    <Select.Option key={t.id} value={t.id}>
-                      {t.teacher.user.userDetail.map((teacherName) => {
-                        return (
-                          teacherName.firstname + ' ' + teacherName.lastname
-                        );
-                      })}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Form>
-          </Modal>
-        </Col>
-      </Row>
-      <div>
-        <Row justify="space-between" className="mb-6">
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <Table dataSource={schoolYearClass} rowKey="id" className="w-full">
-              <Table.Column title="STT" dataIndex="id" className="w-1" />
-              <Table.Column title="Tên lớp" dataIndex="className" />
-              <Table.Column title="Mã lớp" dataIndex="classCode" />
-              <Table.Column
-                title="Thuộc khối"
-                dataIndex="grade"
-                render={(text, record: SchoolYearClassData) =>
-                  `${record.grade.name}`
-                }
-              />
+    return (
+        <div className="container mx-auto p-4 md:p-6 2xl:p-10">
+            <Row justify="space-between" className="mb-6">
+                <Col>
+                    <Button type="default" onClick={showModal}>
+                        Thêm
+                    </Button>
+                </Col>
+                <Col>
+                    <Modal
+                        title="Thêm lớp"
+                        visible={isModalOpen}
+                        onCancel={handleCancel}
+                        footer={[
+                            <Button key="back" onClick={handleCancel}>
+                                Hủy
+                            </Button>,
+                            <Button key="submit" type="primary" onClick={handleSubmit}>
+                                Gửi
+                            </Button>,
+                        ]}
+                    >
+                        <Form
+                            form={form}
+                            name="addSchoolYearTeacherForm"
+                            labelCol={{ flex: '110px' }}
+                            labelAlign="left"
+                            labelWrap
+                            wrapperCol={{ flex: 1 }}
+                            colon={false}
+                        >
+                            <Form.Item
+                                label="Tên lớp"
+                                name="className"
+                                rules={[
+                                    { required: true, message: 'Vui lòng chọn giáo viên!' },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                            <Form.Item
+                                label="Mã lớp"
+                                name="classCode"
+                                rules={[{ required: true, message: 'Vui lòng chọn năm học!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                            {/* Adjusted labels for the following form items */}
+                            <Form.Item
+                                label="Khối học"
+                                name="gradeId"
+                                rules={[{ required: true, message: 'Vui lòng chọn khối học!' }]}
+                            >
+                                <Select>
+                                    {grades.map((grade) => (
+                                        <Select.Option key={grade.id} value={grade.id}>
+                                            {grade.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item
+                                label="Phòng học"
+                                name="roomId"
+                                rules={[
+                                    { required: true, message: 'Vui lòng chọn phòng học!' },
+                                ]}
+                            >
+                                <Select>
+                                    {rooms.map((room: any) => (
+                                        <Select.Option key={room.id} value={room.id}>
+                                            {room.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item
+                                label="Giáo viên"
+                                name="teacherSchoolYear"
+                                rules={[
+                                    { required: true, message: 'Vui lòng chọn giáo viên!' },
+                                ]}
+                            >
+                                <Select>
+                                    {teacherSchoolYears.map((t) => (
+                                        <Select.Option key={t.id} value={t.id}>
+                                            {t.teacher.user.userDetail.map((teacherName) => {
+                                                return (
+                                                    teacherName.firstname + ' ' + teacherName.lastname
+                                                );
+                                            })}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+                </Col>
+            </Row>
+            <div>
+                <Row justify="space-between" className="mb-6">
+                    {isLoading ? (
+                        <Loader />
+                    ) : (
+                        <Table dataSource={schoolYearClass} rowKey="id" className="w-full">
+                            <Table.Column title="STT" dataIndex="id" className="w-1" />
+                            <Table.Column title="Tên lớp" dataIndex="className" />
+                            <Table.Column title="Mã lớp" dataIndex="classCode" />
+                            <Table.Column
+                                title="Thuộc khối"
+                                dataIndex="grade"
+                                render={(text, record: SchoolYearClassData) =>
+                                    `${record.grade.name}`
+                                }
+                            />
 
-              <Table.Column
-                title="Phòng học"
-                dataIndex="room"
-                render={(text, record: SchoolYearClassData) =>
-                  `${record.room.name}`
-                }
-              />
-              <Table.Column
-                title="Giáo viên chủ nhiệm"
-                dataIndex="teacher"
-                render={(text, record: SchoolYearClassData) =>
-                  `${record.teacherSchoolYear.teacher.sortName}`
-                }
-              />
-            </Table>
-          )}
-        </Row>
-      </div>
-    </div>
-  );
+                            <Table.Column
+                                title="Phòng học"
+                                dataIndex="room"
+                                render={(text, record: SchoolYearClassData) =>
+                                    `${record.room.name}`
+                                }
+                            />
+                            <Table.Column
+                                title="Giáo viên chủ nhiệm"
+                                dataIndex="teacher"
+                                render={(text, record: SchoolYearClassData) =>
+                                    `${record.teacherSchoolYear.teacher.sortName}`
+                                }
+                            />
+                        </Table>
+                    )}
+                </Row>
+            </div>
+        </div>
+    );
 }
