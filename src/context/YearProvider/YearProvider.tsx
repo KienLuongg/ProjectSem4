@@ -7,6 +7,7 @@ import React, {
   ReactNode,
 } from 'react';
 import mainAxios from '../../apis/main-axios';
+import teacherApi from '../../apis/urlApi';
 
 export type YearContextType = {
   idYear: number | null;
@@ -25,35 +26,26 @@ interface Props {
 }
 
 const YearProvider: React.FC<Props> = ({ children }) => {
-  const [idYear, setIdYear] = useState<number | null>(() => {
+  const [idYear, setIdYear] = useState<any>(() => {
     const storedYear = localStorage.getItem('idYear');
-    return storedYear ? parseInt(storedYear, 10) : null;
+    return storedYear ? parseInt(storedYear, 10) : 1;
   });
   const [schoolYears, setSchoolYears] = useState<any[]>([]);
-
-  const fetchData = (id: number) => {
-    mainAxios
-      .get(`/api/v1/school/school-year`)
-      .then((response) => {
-        setSchoolYears(response.data);
-        const defaultOption = response.data.find((year: any) => year.id === id);
+  useEffect(() => {
+    const fetchData = async (id: number) => {
+      try {
+        const res = await teacherApi.getSchoolYear();
+        setSchoolYears(res?.data);
+        const defaultOption = res?.data.find((year: any) => year.id === id);
         if (defaultOption) {
           setIdYear(defaultOption.id);
-          console.log(defaultOption.id);
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error fetching data:', error);
-      });
-  };
-
-  useEffect(() => {
-    if (idYear !== null) {
-      localStorage.setItem('idYear', idYear.toString());
-      fetchData(idYear);
-    }
+      }
+    };
+    fetchData(idYear);
   }, [idYear]);
-
   const value = useMemo(
     () => ({
       idYear,

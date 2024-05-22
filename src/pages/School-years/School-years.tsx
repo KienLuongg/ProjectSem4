@@ -51,7 +51,6 @@ export default function SchoolYears() {
   const handleSubmit = async () => {
     try {
       const formData = await form.validateFields();
-
       const res = await teacherApi.postCreateSchoolYear(formData);
 
       setIsModalOpen(false);
