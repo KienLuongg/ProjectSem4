@@ -165,6 +165,7 @@ export default function SchoolYearTeacher() {
                 <Table
                     dataSource={schoolYearTeachers}
                     rowKey="id"
+                    scroll={{ y: 450 }}
                     className="text-black dark:text-white"
                 >
                     <Table.Column

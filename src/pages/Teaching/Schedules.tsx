@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { Button, Form, Input, Table, Modal } from 'antd';
 import Loader from '../../common/Loader';
-import teacherApi from '../../apis/urlApi';
-import { Lesson, SchoolYearClassData } from '../../types/response';
-import mainAxios from '../../apis/main-axios';
-import { YearContext } from '../../context/YearProvider/YearProvider';
+
 
 export default function Schedules() {
   const [isModalOpen, setIsModalOpen] = useState(false);
