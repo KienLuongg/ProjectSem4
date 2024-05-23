@@ -27,14 +27,12 @@ export default function Students() {
       setIsLoading(true);
       try {
         const res = await teacherApi.getStudents(idYear);
-        setStudents(res.data);
+        setStudents(res?.data);
+        setIsLoading(false);
       } catch (error) {
         console.error('Failed to fetch students:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
-
     fetchStudents();
   }, [idYear]);
 
