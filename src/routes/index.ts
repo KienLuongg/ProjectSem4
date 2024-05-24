@@ -101,7 +101,7 @@ export const coreRoutes: RouteConfig[] = [
     roles: ['ROLE_GV', 'ROLE_BGH'],
   },
   {
-    path: '/attendance',
+    path: '/attendence',
     component: Attendence,
     title: 'Attendance',
     roles: ['ROLE_GV', 'ROLE_BGH'],
