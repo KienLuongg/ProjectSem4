@@ -1,15 +1,24 @@
-import { lazy } from 'react';
+
+import { FC, LazyExoticComponent, lazy } from 'react'
+
+type LazyComponent = LazyExoticComponent<FC<any>>
+
+interface RouteConfig {
+  path: string
+  component: LazyComponent
+  title: string
+  roles: string[]
+}
 
 const Attendence = lazy(() => import('../pages/Attendence/Attendence'))
-const Students = lazy(() => import('../pages/Students/Student-list'));
-const SchoolYears = lazy(() => import('../pages/School-years/School-years'));
-const Teachers = lazy(() => import('../pages/Teachers/Teachers'));
-const NotFound = lazy(() => import('../pages/404page'));
+const Students = lazy(() => import('../pages/Students/Student-list'))
+const SchoolYears = lazy(() => import('../pages/School-years/School-years'))
+const ClassesList = lazy(() => import('../pages/Category/School-year-class'))
+const Teachers = lazy(() => import('../pages/Teachers/Teachers'))
 const SchoolYearSubject = lazy(() => import('../pages/Category/School-year-subjects'));
 const SchoolYearTeacher = lazy(() => import('../pages/Category/Teacher-school-year'));
 const SubjectProgram = lazy(() => import('../pages/Category/Subject-program'));
-const SchoolYearClass = lazy(() => import('../pages/Category/School-year-class'));
-const Profile = lazy(() => import('../pages/Profile'));
+// const Profile = lazy(() => import('../pages/Profile'));
 const Schedule = lazy(() => import('../pages/Teaching/Schedules'))
 const TeachingAssign = lazy(() => import('../pages/Teaching/Teaching-assignment'))
 const AssignmentList = lazy(() => import('../pages/Teaching/Teaching-assign-list'))
@@ -18,97 +27,84 @@ const Evaluate = lazy(() => import('../pages/Evaluate'))
 const tem1 = lazy(() => import('../pages/Teaching/Teaching-assignment2'))
 const tem2 = lazy(() => import('../pages/Category/Teacher-School-Year2'))
 
-
-const coreRoutes = [
-  {
-    path: '*',
-    title: 'NotFound',
-    component: NotFound,
-  },
+export const coreRoutes: RouteConfig[] = [
   {
     path: '/students',
-    title: 'Students',
     component: Students,
+    title: 'Students',
+    roles: ['ROLE_BGH'],
   },
   {
     path: '/school-years',
-    title: 'School Years',
     component: SchoolYears,
+    title: 'School Years',
+    roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/classes',
+    component: ClassesList,
+    title: 'Classes',
+    roles: ['ROLE_BGH'],
   },
   {
     path: '/teachers',
-    title: 'Teachers',
     component: Teachers,
-  },
-  {
-    path: '/attendence',
-    title: 'Attendence',
-    component: Attendence,
+    title: 'Teachers',
+    roles: ['ROLE_BGH'],
   },
   {
     path: '/school-year-subjects',
-    title: 'Subjects',
     component: SchoolYearSubject,
+    title: 'Attendance',
+    roles: ['ROLE_BGH'],
   },
   {
     path: '/school-year-teachers',
-    title: 'Teachers',
     component: SchoolYearTeacher,
+    title: 'Attendance',
+    roles: ['ROLE_BGH'],
   },
   {
     path: '/subject-program',
-    title: 'Program',
     component: SubjectProgram,
-  },
-  {
-    path: '/school-year-class',
-    title: 'Class',
-    component: SchoolYearClass,
-  },
-  {
-    path: '/profile',
-    title: 'Profile',
-    component: Profile,
-  },
-  {
-    path: '/schedule',
-    title: 'Schedule',
-    component: Schedule,
-  },
-  {
-    path: '/assignment',
-    title: 'Assignment',
-    component: TeachingAssign,
+    title: 'Attendance',
+    roles: ['ROLE_BGH'],
   },
   {
     path: '/assignment-list',
-    title: 'Assignment List',
     component: AssignmentList,
+    title: 'Attendance',
+    roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/assignment',
+    component: TeachingAssign,
+    title: 'Attendance',
+    roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/schedule',
+    component: Schedule,
+    title: 'Attendance',
+    roles: ['ROLE_BGH'],
   },
   {
     path: '/acknowledge',
-    title: 'Acknowledge',
     component: Acknowledge,
+    title: 'Attendance',
+    roles: ['ROLE_GV', 'ROLE_BGH'],
   },
   {
     path: '/evaluate',
-    title: 'Evaluate',
     component: Evaluate,
-  },
-
-  // template
-  {
-    path: '/1',
-    title: '1',
-    component: tem1,
+    title: 'Attendance',
+    roles: ['ROLE_GV', 'ROLE_BGH'],
   },
   {
-    path: '/2',
-    title: '2',
-    component: tem2,
-  },
-
-];
-
-const routes = [...coreRoutes];
-export default routes;
+    path: '/attendance',
+    component: Attendence,
+    title: 'Attendance',
+    roles: ['ROLE_GV', 'ROLE_BGH'],
+  }
+]
+export default coreRoutes

@@ -124,8 +124,8 @@ export default function SchoolYearClass() {
     };
 
     return (
-        <div className="container mx-auto p-4 md:p-6 2xl:p-10">
-            <Row justify="space-between" className="mb-6">
+        <div className="p-4 md:p-6 2xl:p-10">
+            <Row className="mb-6">
                 <Col>
                     <Button type="default" onClick={showModal}>
                         Thêm
@@ -228,7 +228,8 @@ export default function SchoolYearClass() {
                 <div>
                     <Row justify="space-between" className="mb-6">
 
-                        <Table dataSource={schoolYearClass} rowKey="id" className="w-full">
+                        <Table dataSource={schoolYearClass} rowKey="id" scroll={{ y: 450 }}
+                            className="w-full">
                             <Table.Column title="STT" dataIndex="id" className="w-1" />
                             <Table.Column title="Tên lớp" dataIndex="className" />
                             <Table.Column title="Mã lớp" dataIndex="classCode" />

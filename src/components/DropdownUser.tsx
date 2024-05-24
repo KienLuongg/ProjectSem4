@@ -1,78 +1,73 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-
-import { notification } from 'antd';
-import { deleteCookie, getCookie } from '../utils/storage/cookie-storage';
-import { Storage } from '../contstants/storage';
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { notification } from 'antd'
+import { getLocalStorageItem } from '../utils/storage/local-storage'
+import { deleteAllCookies } from '../utils/storage/cookie-storage'
+import { Storage } from '../contstants/storage'
 
 const DropdownUser = () => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate();
-  const trigger = useRef<any>(null);
-  const dropdown = useRef<any>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const navigate = useNavigate()
+  const trigger = useRef<any>(null)
+  const dropdown = useRef<any>(null)
+
+  const parseJSON = (data: any) => {
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const userData = parseJSON(getLocalStorageItem(Storage?.user) || '')
 
   // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
-      if (!dropdown.current) return;
-      if (
-        !dropdownOpen ||
-        dropdown.current.contains(target) ||
-        trigger.current.contains(target)
-      )
-        return;
-      setDropdownOpen(false);
-    };
-    document.addEventListener('click', clickHandler);
-    return () => document.removeEventListener('click', clickHandler);
-  });
+      if (!dropdown.current) return
+      if (!dropdownOpen || dropdown.current.contains(target) || trigger.current.contains(target)) return
+      setDropdownOpen(false)
+    }
+    document.addEventListener('click', clickHandler)
+    return () => document.removeEventListener('click', clickHandler)
+  })
   // close if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }: KeyboardEvent) => {
-      if (!dropdownOpen || keyCode !== 27) return;
-      setDropdownOpen(false);
-    };
-    document.addEventListener('keydown', keyHandler);
-    return () => document.removeEventListener('keydown', keyHandler);
-  });
+      if (!dropdownOpen || keyCode !== 27) return
+      setDropdownOpen(false)
+    }
+    document.addEventListener('keydown', keyHandler)
+    return () => document.removeEventListener('keydown', keyHandler)
+  })
 
-  const handleChange: any = () => {
+  const handleChange = () => {
+    deleteAllCookies()
+    navigate('/sign-in')
     notification.success({
       message: 'Logout success',
-    });
-    const token = getCookie(Storage.token);
-    deleteCookie(token);
-
-    navigate('/sign-in');
-  };
-
+    })
+  }
   return (
     <div className="relative">
-      <Link
-        ref={trigger}
-        onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-4"
-        to="#"
-      >
+      <Link ref={trigger} onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-4" to="#">
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Admin
+            {`${userData?.userDetail?.firstname} ${userData?.userDetail?.lastname}` || 'ADMIN'}
           </span>
-          <span className="block text-xs">BGH</span>
+          <span className="block text-xs"> {userData?.userDetail?.citizen_id}</span>
         </span>
 
-        <span className="h-12 w-12 rounded-full">
+        <span className="w-12 h-12 rounded-full">
           <img
-            className="h-12 w-12 rounded-full"
-            src="src/images/user/user1102.jpeg"
-            alt="User"
+            className="w-12 h-12 rounded-full"
+            src="https://5.imimg.com/data5/SELLER/Default/2023/3/294997220/ZX/OC/BE/3365461/acrylic-admin-office-door-sign-board.jpg"
+            // src={userData?.avatar}
+            alt={userData?.userDetail?.email}
           />
         </span>
 
         <svg
-          className={`hidden fill-current sm:block ${
-            dropdownOpen ? 'rotate-180' : ''
-          }`}
+          className={`hidden fill-current sm:block ${dropdownOpen ? 'rotate-180' : ''}`}
           width="12"
           height="8"
           viewBox="0 0 12 8"
@@ -93,9 +88,8 @@ const DropdownUser = () => {
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${
-          dropdownOpen === true ? 'block' : 'hidden'
-        }`}
+        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${dropdownOpen === true ? 'block' : 'hidden'
+          }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
           <li>
@@ -196,7 +190,7 @@ const DropdownUser = () => {
       </div>
       {/* <!-- Dropdown End --> */}
     </div>
-  );
-};
+  )
+}
 
-export default DropdownUser;
+export default DropdownUser

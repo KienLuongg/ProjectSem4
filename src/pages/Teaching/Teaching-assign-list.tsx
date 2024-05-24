@@ -39,7 +39,7 @@ const App: React.FC = () => {
 
 
   return (
-    <div className="p-4 md:p-6 2xl:p-1">
+    <div className="p-4 md:p-8 2xl:p-10">
       <Row>
         <Col span={6}>
           <Breadcrumb className="mb-10">
@@ -79,11 +79,11 @@ const App: React.FC = () => {
             </Radio.Group>
           </Col>
           <Col span={24}>
-            <div className="mt-auto">
+            <div className="mt-auto grid justify-items-center  mb-4 w-full  rounded-md">
               <NavLink
                 to="/assignment"
                 type="default"
-                className="border-2 border-solid rounded-md mb-4 w-full bg-white-500 text-black p-2"
+                className="text-base text-meta-9 border-2 border-solid bg-form-input w-full text-center p-2 rounded-md grid"
               >
                 Thực hiện phân công
               </NavLink>
@@ -97,7 +97,7 @@ const App: React.FC = () => {
               {isLoading ? (
                 <Loader />
               ) : (
-                <Table dataSource={teacherClassSubject} loading={isLoading} className="mb-4" >
+                <Table dataSource={teacherClassSubject} loading={isLoading} className="mb-4" scroll={{ y: 500 }}>
                   <Table.Column title="Giáo viên"
                     render={(text, record: TeacherClassSubjectData) =>
                       `${record.teacherSchoolYear.teacher.sortName}`} />

@@ -221,6 +221,7 @@ export default function SchoolProgram() {
                     <Table
                         dataSource={schoolProgram}
                         rowKey="id"
+                        scroll={{ y: 450 }}
                         className=" text-black dark:text-white"
                     >
                         <Table.Column title="Id" dataIndex="id" />

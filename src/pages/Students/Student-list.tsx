@@ -52,7 +52,6 @@ export default function Students() {
       const formData = await form.validateFields();
 
       const res = await mainAxios.post('/api/v1/student', formData);
-      console.log(res);
 
       setIsModalOpen(false);
     } catch (error: any) {

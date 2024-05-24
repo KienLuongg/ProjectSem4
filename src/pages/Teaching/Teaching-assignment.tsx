@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Breadcrumb, Button, Col, Form, Row, Table, message } from 'antd';
+import { Breadcrumb, Button, Col, Form, Row, Table, message, Radio } from 'antd';
 import { NavLink } from 'react-router-dom';
 import teacherApi from '../../apis/urlApi';
 import { TeacherClassSubjectData, SchoolYearClassData, SchoolYearSubjectResponse } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
+import Loader from '../../common/Loader';
 
 const AssignmentForm: React.FC = () => {
   const [form] = Form.useForm();
@@ -13,8 +14,8 @@ const AssignmentForm: React.FC = () => {
   const [classes, setClasses] = useState<SchoolYearClassData[]>([]);
   const [subjects, setSubjects] = useState<SchoolYearSubjectResponse[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null);
-  const [selectedClass, setSelectedClass] = useState<string | null>(null);
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -24,7 +25,7 @@ const AssignmentForm: React.FC = () => {
         const res = await teacherApi.getTeacherSchoolYearClassSubject(idYear);
         setTeacherClassSubject(res?.data);
       } catch (error) {
-        console.error('Failed to fetch students:', error);
+        console.error('Failed to fetch teachers:', error);
       } finally {
         setIsLoading(false);
       }
@@ -40,7 +41,7 @@ const AssignmentForm: React.FC = () => {
         const res = await teacherApi.getSchoolYearClass(idYear);
         setClasses(res?.data);
       } catch (error) {
-        console.error('Failed to fetch students:', error);
+        console.error('Failed to fetch classes:', error);
       } finally {
         setIsLoading(false);
       }
@@ -64,29 +65,44 @@ const AssignmentForm: React.FC = () => {
     fetchSubjects();
   }, [idYear]);
 
-  const handleTeacherClick = (teacherId: number) => {
-    setSelectedTeacher(String(teacherId));
+  const handleTeacherChange = (e: any) => {
+    setSelectedTeacher(e.target.value);
   };
 
-  const handleClassChange = (classId: number) => {
-    setSelectedClass(String(classId));
+  const handleClassChange = (selectedRowKeys: React.Key[]) => {
+    setSelectedClasses(selectedRowKeys.map(String));
   };
 
-  const handleSubjectsChange = (subjectIds: number[]) => {
-    setSelectedSubjects(subjectIds.map(String));
+  const handleSubjectChange = (e: any) => {
+    setSelectedSubject(e.target.value);
   };
 
   const handleSubmit = async () => {
+
+    if (selectedTeacher === null || selectedSubject === null || selectedClasses.length === 0) {
+      message.error('Please select a teacher, subject, and at least one class.');
+      return;
+    }
+    const payload = {
+      teacherSchoolYearId: Number(selectedTeacher),
+      subjectClassList: [
+        {
+          schoolYearSubjectId: Number(selectedSubject),
+          schoolYearClassId: selectedClasses.map(Number),
+        },
+      ],
+    };
     try {
-      const formData = await form.validateFields();
-      formData['schoolYearId'] = idYear;
-      const res = await teacherApi.postTeacherClassSubject(formData);
+      const res = await teacherApi.postTeacherClassSubject(payload);
       message.success('Data submitted successfully!');
     } catch (error: any) {
-      if (error.response) console.error('Server Error:', error.response.data);
-      else if (error.request) console.error('Network Error:', error.request);
-      else console.error('Error:', error.message);
-      message.error('Failed to submit data. Please try again later.');
+      if (error.response) {
+        message.error(`Server Error: ${error.response.data.message}`);
+      } else if (error.request) {
+        message.error('Network Error: Please check your connection.');
+      } else {
+        message.error(`Error: ${error.message}`);
+      }
     }
   };
 
@@ -100,59 +116,67 @@ const AssignmentForm: React.FC = () => {
       <Row className="flex justify-end mb-4 pr-5">
         <NavLink
           to="/assignment-list"
-          className="border-2 border-solid rounded-md mr-3 px-4"
+          className="border bg-whiter text-center text-black px-4 rounded-md mr-3 pt-0.5"
         >
           Quay lại
         </NavLink>
         <Button onClick={handleSubmit} className="px-8 bg-blue text-white">Lưu</Button>
       </Row>
-      <Row className='flex'>
-        <Col span={8} className="">
-          <Table
-            dataSource={teacherClassSubject}
-            rowKey="id"
-            onRow={(record) => ({
-              onClick: () => handleTeacherClick(record.teacherSchoolYear.id),
-              style: { cursor: 'pointer' },
-            })}
-            rowClassName={(record) => (selectedTeacher !== null && record.teacherSchoolYear.id === +selectedTeacher ? 'bg-blue-100' : '')}
-          >
-            <Table.Column title="Giáo viên" render={(text, record: TeacherClassSubjectData) => (
-              <span>{record.teacherSchoolYear.teacher.sortName}</span>
-            )} />
-          </Table>
-        </Col>
-        <Col span={8} className="">
-          <Table
-            dataSource={classes}
-            rowKey="id"
-            onRow={(record) => ({
-              onClick: () => handleClassChange(record.id),
-              style: { cursor: 'pointer' },
-            })}
-            rowClassName={(record) => (record.id === selectedClass ? 'bg-blue-100' : '')}
-          >
-            <Table.Column title="Lớp" dataIndex="className" />
-          </Table>
-        </Col>
-        <Col span={8}>
-          <Table
-            dataSource={subjects}
-            rowKey="id"
-            rowSelection={{
-              type: 'checkbox',
-              onChange: (selectedRowKeys: React.Key[], selectedRows: SchoolYearSubjectResponse[]) => {
-                handleSubjectsChange(selectedRowKeys as number[]);
-              },
-              selectedRowKeys: selectedSubjects,
-            }}
-          >
-            <Table.Column title="Môn học" render={(text, record: SchoolYearSubjectResponse) => (
-              <span>{record.subject.name}</span>
-            )} />
-          </Table>
-        </Col>
-      </Row>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <Form form={form}>
+          <Row className=''>
+            <Col span={8} className="">
+              <Radio.Group onChange={handleTeacherChange} value={selectedTeacher}>
+                <Table
+                  dataSource={teacherClassSubject}
+                  rowKey="id"
+                  pagination={false}
+                  scroll={{ y: 450 }}
+                  rowClassName={(record) => (selectedTeacher !== null && record.teacherSchoolYear.id === +selectedTeacher ? 'selected-row' : '')}
+                >
+                  <Table.Column title="Giáo viên" render={(text, record: TeacherClassSubjectData) => (
+                    <Radio value={record.teacherSchoolYear.id}>{record.teacherSchoolYear.teacher.sortName}</Radio>
+                  )} />
+                </Table>
+              </Radio.Group>
+            </Col>
+            <Col span={8} className="">
+              <Radio.Group onChange={handleSubjectChange} value={selectedSubject}>
+                <Table
+                  dataSource={subjects}
+                  rowKey="id"
+                  pagination={false}
+                  scroll={{ y: 450 }}
+                  rowClassName={(record) => (selectedSubject !== null && record.id === +selectedSubject ? 'selected-row' : '')}
+                >
+                  <Table.Column title="Môn học" render={(text, record: SchoolYearSubjectResponse) => (
+                    <Radio value={record.id}>{record.subject.name}</Radio>
+                  )} />
+                </Table>
+              </Radio.Group>
+            </Col>
+            <Col span={8}>
+              <Table
+                dataSource={classes}
+                rowKey="id"
+                pagination={false}
+                scroll={{ y: 450 }}
+                rowSelection={{
+                  type: 'checkbox',
+                  onChange: handleClassChange,
+                  selectedRowKeys: selectedClasses.map(Number),
+                }}
+              >
+                <Table.Column title="Lớp" render={(text, record: SchoolYearClassData) => (
+                  <span>{record.className}</span>
+                )} />
+              </Table>
+            </Col>
+          </Row>
+        </Form>
+      )}
     </div>
   );
 };
