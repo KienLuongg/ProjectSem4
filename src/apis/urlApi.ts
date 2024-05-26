@@ -24,6 +24,8 @@ enum URL {
   GET_ROOMS = '/api/v1/school/get-rooms',
   //students
   GET_STUDENTS_YEARS = '/api/v1/student/get-student-year-info-by',
+  //Schedule
+  GET_SCHEDULE = '/api/v1/schedule/get-schedule-by',
 }
 
 const teacherApi = {
@@ -119,5 +121,8 @@ const teacherApi = {
   getStudents: (id: number): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_STUDENTS_YEARS}?bySchoolYearId=${id}`);
   },
+  getSchedule: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_SCHEDULE}`)
+  }
 };
 export default teacherApi;

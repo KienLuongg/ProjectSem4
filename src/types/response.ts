@@ -251,20 +251,6 @@ export interface Student {
   }
 }
 
-export interface Lesson {
-  id: number;
-  indexLesson: number;
-  studyTime: string;
-  dayOfWeek: string;
-  note: string | null;
-  teacherSchoolYearId: number;
-  schoolYearClassId: number;
-  schoolYearSubjectId: number;
-  teacherName: string;
-  className: string;
-  subjectName: string;
-}
-
 export interface TeacherClassSubjectData {
   teacherSchoolYear: {
     id: number;
@@ -338,3 +324,26 @@ export interface TeacherClassSubjectData {
     }[];
   }[];
 }
+
+export interface Lesson {
+  id: number;
+  indexLesson: number;
+  studyTime: string;
+  dayOfWeek: string;
+  note: string | null;
+  teacherSchoolYearId: number;
+  schoolYearClassId: number;
+  schoolYearSubjectId: number;
+  teacherName: string;
+  className: string;
+  subjectName: string;
+}
+
+export interface Schedule {
+  T2?: Lesson;
+  T3?: Lesson;
+  T4?: Lesson;
+  T5?: Lesson;
+  T6?: Lesson;
+}
+

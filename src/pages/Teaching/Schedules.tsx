@@ -1,132 +1,168 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Table, Button, Modal, Form, Input, notification } from 'antd';
-import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
+import { Table, Button, Row, Col, Select } from 'antd';
+import './Timetable.css';
+import teacherApi from '../../apis/urlApi';
+import { Schedule, SchoolYearClassData } from '../../types/response';
 import mainAxios from '../../apis/main-axios';
+import Loader from '../../common/Loader';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 
-function Schedules() {
-  const [schedule, setSchedule] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
-  const [form] = Form.useForm();
+const { Option } = Select;
+
+type Day = 'T2' | 'T3' | 'T4' | 'T5' | 'T6';
+
+const Timetable: React.FC = () => {
+  const [schedule, setSchedule] = useState<Schedule[]>([]);
+  const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
   const { idYear } = useContext(YearContext);
+  const [classId, setClassId] = useState<number | null>(1);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    fetchSchedule();
-  }, []);
+    const fetchScheduleData = async () => {
+      if (classId === null) return;
+      setIsLoading(true);
+      try {
+        const res = await mainAxios.get(`/api/v1/schedule/get-schedule-by?classId=${classId}`);
+        setSchedule(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch schedule:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchScheduleData();
+  }, [classId]);
 
-  const fetchSchedule = async () => {
-    const response = await mainAxios.get(
-      `/api/v1/schedule?schoolYearId=${idYear}`
-    );
-    setSchedule(response.data);
-  };
+  useEffect(() => {
+    const fetchSchoolYearClassData = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch school year class data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSchoolYearClassData();
+  }, [idYear]);
 
-  const showModal = (item) => {
-    setCurrentItem(item);
-    form.setFieldsValue(item);
-    setIsModalVisible(true);
-  };
+  const transformScheduleData = (schedule: Schedule[], shift: 'morning' | 'afternoon'): any[] => {
+    const transformedData: any[] = [];
+    const days: Day[] = ['T2', 'T3', 'T4', 'T5', 'T6'];
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setCurrentItem(null);
-    form.resetFields();
-  };
+    const shiftOffset = shift === 'morning' ? 0 : 4;
 
-  const handleDelete = async (id) => {
-    await axios.delete(`/api/path/to/schedule/${id}`);
-    fetchSchedule();
-    notification.success({
-      message: 'Deleted',
-      description: 'The class has been successfully deleted.',
-    });
-  };
-
-  const handleSave = async () => {
-    await form.validateFields();
-    const values = form.getFieldsValue();
-    if (currentItem) {
-      await axios.put(`/api/path/to/schedule/${currentItem.id}`, values);
-    } else {
-      await axios.post('/api/path/to/schedule', values);
+    for (let i = 1; i <= 4; i++) {
+      const row: any = { indexLesson: `<b>Tiết ${i > 4 ? i - 4 : i}</b>` };
+      days.forEach(day => {
+        const lesson = schedule[i - 1 + shiftOffset]?.[day];
+        row[day.toLowerCase()] = lesson ? `<b>${lesson.subjectName}</b><br />(${lesson.teacherName})` : '';
+      });
+      transformedData.push(row);
     }
-    fetchSchedule();
-    handleCancel();
-    notification.success({
-      message: 'Success',
-      description: currentItem
-        ? 'Class updated successfully!'
-        : 'New class added successfully!',
-    });
+
+    return transformedData;
   };
 
   const columns = [
-    { title: 'Day of Week', dataIndex: 'dayOfWeek', key: 'dayOfWeek' },
-    { title: 'Study Time', dataIndex: 'studyTime', key: 'studyTime' },
-    { title: 'Subject Name', dataIndex: 'subjectName', key: 'subjectName' },
-    { title: 'Teacher Name', dataIndex: 'teacherName', key: 'teacherName' },
-    { title: 'Class Name', dataIndex: 'className', key: 'className' },
     {
-      title: 'Actions',
-      key: 'actions',
-      render: (_, record) => (
-        <>
-          <Button onClick={() => showModal(record)} style={{ marginRight: 8 }}>
-            Edit
-          </Button>
-          <Button onClick={() => handleDelete(record.id)} type="danger">
-            Delete
-          </Button>
-        </>
-      ),
+      title: 'Lịch',
+      dataIndex: 'indexLesson',
+      key: 'indexLesson',
+      width: 80,
+      align: 'center' as 'center',
+      render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
+    },
+    {
+      title: 'Thứ 2',
+      dataIndex: 't2',
+      key: 't2',
+      align: 'center' as 'center',
+      render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
+    },
+    {
+      title: 'Thứ 3',
+      dataIndex: 't3',
+      key: 't3',
+      align: 'center' as 'center',
+      render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
+    },
+    {
+      title: 'Thứ 4',
+      dataIndex: 't4',
+      key: 't4',
+      align: 'center' as 'center',
+      render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
+    },
+    {
+      title: 'Thứ 5',
+      dataIndex: 't5',
+      key: 't5',
+      align: 'center' as 'center',
+      render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
+    },
+    {
+      title: 'Thứ 6',
+      dataIndex: 't6',
+      key: 't6',
+      align: 'center' as 'center',
+      render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
     },
   ];
 
-  return (
-    <>
-      <Button type="primary" onClick={() => showModal()}>
-        Add New Class
-      </Button>
-      <Table columns={columns} dataSource={schedule} rowKey="id" />
-      <Modal
-        title={currentItem ? 'Edit Class' : 'Add New Class'}
-        visible={isModalVisible}
-        onOk={handleSave}
-        onCancel={handleCancel}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="dayOfWeek"
-            label="Day of Week"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="studyTime"
-            label="Study Time"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="subjectName"
-            label="Subject Name"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="teacherName" label="Teacher Name">
-            <Input />
-          </Form.Item>
-          <Form.Item name="className" label="Class Name">
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
-  );
-}
+  const handleClassChange = (value: number) => {
+    setClassId(value);
+  };
 
-export default Schedules;
-j
+  const morningData = transformScheduleData(schedule, 'morning');
+  const afternoonData = transformScheduleData(schedule, 'afternoon');
+
+  return (
+    <div className="timetable-container">
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <div>
+          <Row justify="space-between" align="middle" className="timetable-selectors" gutter={[16, 16]}>
+            <Col>
+              <Select defaultValue={classId} style={{ width: 150 }} onChange={handleClassChange}>
+                {schoolYearClass.map((classData) => (
+                  <Option key={classData.id} value={classData.id}>
+                    {classData.className}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+            <Col>
+              <Button type="primary">Export</Button>
+            </Col>
+          </Row>
+
+          <h2 className='mb-3 text-lg'>Buổi sáng</h2>
+          <Table
+            columns={columns}
+            dataSource={morningData}
+            pagination={false}
+            bordered
+            rowClassName={(record, index) => (index % 2 === 0 ? 'even-row' : 'odd-row')}
+          />
+
+          <h2 className='mb-3 mt-3 text-lg'>Buổi chiều</h2>
+          <Table
+            columns={columns}
+            dataSource={afternoonData}
+            pagination={false}
+            bordered
+            rowClassName={(record, index) => (index % 2 === 0 ? 'even-row' : 'odd-row')}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Timetable;
