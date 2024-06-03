@@ -143,7 +143,8 @@ const Timetable: React.FC = () => {
               </Select>
             </Col>
             <Col>
-              <Button type="primary">Thông báo</Button>
+              <Button className='bg-bodydark2' type="primary">Tạo mới</Button>
+              <Button className='ml-5' type="primary">Thông báo</Button>
             </Col>
           </Row>
 

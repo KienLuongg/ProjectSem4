@@ -43,11 +43,13 @@ export default function SchoolYearClass() {
             try {
                 const res = await teacherApi.getSchoolYearClass(idYear);
                 setSchoolYearClass(res?.data || []);
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status === 2000) {
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
                     setSchoolYearClass([]);
+                } else if (error instanceof Error) {
+                    console.error('Failed to fetch school year classes:', error.message);
                 } else {
-                    console.error('Failed to fetch school year classes:', error);
+                    console.error('An unknown error occurred.');
                 }
             } finally {
                 setIsLoading(false);
@@ -228,7 +230,7 @@ export default function SchoolYearClass() {
                 <div>
                     <Row justify="space-between" className="mb-6">
                         <Table dataSource={schoolYearClass} rowKey="id" scroll={{ y: 450 }}
-                            className="w-full" locale={{ emptyText: 'No data available' }}>
+                            className="w-full">
                             <Table.Column title="STT" dataIndex="id" className="w-1" />
                             <Table.Column title="Tên lớp" dataIndex="className" />
                             <Table.Column title="Mã lớp" dataIndex="classCode" />

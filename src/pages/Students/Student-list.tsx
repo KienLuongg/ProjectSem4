@@ -30,11 +30,14 @@ export default function Students() {
         const res = await teacherApi.getStudents(idYear);
         setStudents(res?.data);
         setIsLoading(false);
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 2000) {
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
           setStudents([]);
+          setIsLoading(false);
+        } else if (error instanceof Error) {
+          console.error('Failed to fetch school year classes:', error.message);
         } else {
-          console.error('Failed to fetch school year classes:', error);
+          console.error('An unknown error occurred.');
         }
       }
     };

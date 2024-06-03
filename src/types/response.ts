@@ -401,3 +401,28 @@ export interface FeeList {
     };
   }[];
 }
+
+export interface CalendarRelease {
+  id: number;
+  title: string;
+  releaseAt: string;
+  schoolYear: {
+    id: number;
+    startSem1: string;
+    startSem2: string;
+    end: string;
+  };
+  schedules: {
+    id: number;
+    indexLesson: number;
+    studyTime: 'SANG' | 'CHIEU';
+    dayOfWeek: 'T2' | 'T3' | 'T4' | 'T5' | 'T6';
+    note: string | null;
+    teacherSchoolYearId: number;
+    schoolYearClassId: number;
+    schoolYearSubjectId: number;
+    teacherName: string;
+    className: string;
+    subjectName: string;
+  }[];
+}

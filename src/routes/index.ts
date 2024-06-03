@@ -20,6 +20,7 @@ const SchoolYearTeacher = lazy(() => import('../pages/Category/Teacher-school-ye
 const SubjectProgram = lazy(() => import('../pages/Category/Subject-program'));
 // const Profile = lazy(() => import('../pages/Profile'));
 const NoSchedule = lazy(() => import('../pages/Teaching/No-schedule'))
+const CreateCalendarRl = lazy(() => import('../pages/Teaching/calendar-release'))
 const CreateSchedule = lazy(() => import('../pages/Teaching/Create-schedule'))
 const Schedule = lazy(() => import('../pages/Teaching/Schedules'))
 const TeachingAssign = lazy(() => import('../pages/Teaching/Teaching-assignment'))
@@ -99,6 +100,12 @@ export const coreRoutes: RouteConfig[] = [
     path: '/no-schedule',
     component: NoSchedule,
     title: 'Schedule',
+    roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/calendar-rl',
+    component: CreateCalendarRl,
+    title: 'Calenadar Release',
     roles: ['ROLE_BGH'],
   },
   {
