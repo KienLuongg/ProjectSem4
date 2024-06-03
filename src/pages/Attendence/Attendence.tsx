@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { DatePicker, Select, Space, Table, Button, Checkbox } from 'antd';
+import { DatePicker, Select, Space, Table, Button, Checkbox, Form, message } from 'antd';
 import type { TableColumnsType, TableProps } from 'antd';
 import dayjs from 'dayjs';
 import mainAxios from '../../apis/main-axios';
@@ -11,6 +11,7 @@ import {
 } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import teacherApi from '../../apis/urlApi';
+import TextArea from 'antd/es/input/TextArea';
 
 const { Option } = Select;
 
@@ -23,7 +24,7 @@ const Attendences = () => {
   const [classId, setClassId] = useState<number | null>(1);
   const [isLoading, setIsLoading] = useState(true);
   const [attendence, setAttendence] = useState('attendance-by-day');
-
+  const [form] = Form.useForm();
   const [attendanceStatus, setAttendanceStatus] = useState<{ [key: number]: string }>({});
 
   useEffect(() => {
@@ -97,17 +98,17 @@ const Attendences = () => {
       align: 'center',
     },
     {
-      title: 'Nghỉ có phép',
-      dataIndex: 'Nghi_Co_Phep',
+      title: 'Nghỉ học',
+      dataIndex: 'Nghi_hoc',
       width: '10%',
-      key: 'Nghi_Co_Phep',
+      key: 'Nghi_hoc',
       align: 'center',
     },
     {
-      title: 'Nghỉ không phép',
-      dataIndex: 'Nghi_Khong_Phep',
-      width: '10%',
-      key: 'Nghi_Khong_Phep',
+      title: 'ghi chú',
+      dataIndex: 'Ghi_Chu',
+      width: '20%',
+      key: 'Ghi_Chu',
       align: 'center',
     },
     {
@@ -118,10 +119,11 @@ const Attendences = () => {
       align: 'center',
     },
   ];
+
   const dataAttendenceByDay = student.map((data, index) => ({
     key: data.id,
     Stt: index + 1,
-    Ho_Ten: data.students.lastName + ' ' + data.students.firstName, // Assuming `s` contains the name of the student
+    Ho_Ten: data.students.lastName + ' ' + data.students.firstName, // Assuming s contains the name of the student
     Ngay_sinh: formatDate(data.students.birthday.substring(0, 10)),
     Co_Mat: (
       <Checkbox
@@ -129,18 +131,15 @@ const Attendences = () => {
         onChange={() => handleCheckboxChange(data.id, 'Co_Mat')}
       />
     ),
-    Nghi_Co_Phep: (
+    Nghi_hoc: (
       <Checkbox
         checked={attendanceStatus[data.id] === 'Nghi_Co_Phep'}
         onChange={() => handleCheckboxChange(data.id, 'Nghi_Co_Phep')}
       />
     ),
-    Nghi_Khong_Phep: (
-      <Checkbox
-        checked={attendanceStatus[data.id] === 'Nghi_Khong_Phep'}
-        onChange={() => handleCheckboxChange(data.id, 'Nghi_Khong_Phep')}
-      />
-    ),
+    Ghi_Chu: <Form.Item name={['note', data.id]} key={data.id}>
+      <TextArea autoSize />
+    </Form.Item>,
     Trang_Thai: 0 ? 'Đã thông báo' : 'chưa thông báo',
   }));
   const columnsAttendenceByMonth: TableColumnsType<DataTypeAttendence> = [
@@ -222,6 +221,28 @@ const Attendences = () => {
     fetchSchoolYearClassData();
   }, [idYear]);
 
+  const handleSubmit = async () => {
+    try {
+      const values = form.getFieldsValue();
+      const { note } = values;
+      const updatedValues = {
+        ...values,
+        attendanceStatus
+      };
+
+      for (const studentId in updatedValues.attendanceStatus) {
+        const status = updatedValues.attendanceStatus[studentId] === 'Co_Mat';
+        const studentNote = note ? note[studentId] : '';
+        await teacherApi.postAtendence(Number(studentId), status, studentNote)
+          ;
+      }
+      message.success('Attendance data submitted successfully!');
+    } catch (errorInfo) {
+      console.error('Failed to submit form:', errorInfo);
+      message.error('Failed to submit attendance data');
+    }
+  };
+
   return (
     <div className="attendances">
       <div className="attendanceItem">
@@ -238,61 +259,64 @@ const Attendences = () => {
           Điểm danh theo tháng
         </div>
       </div>
-      <div className={`${attendence !== 'attendance-by-day' ? 'hiddens' : 'attendance-by-day'}`}>
-        <div style={{ display: 'flex', padding: '16px' }}>
-          <div style={{ marginRight: '14px' }}>
-            <Select defaultValue={classId} style={{ width: 150 }} onChange={handleChange}>
-              {schoolYearClass.map((classData) => (
-                <Option key={classData.id} value={classData.id}>
-                  {classData.className}
-                </Option>
-              ))}
-            </Select>
+      <Form
+        form={form}>
+        <div className={`${attendence !== 'attendance-by-day' ? 'hiddens' : 'attendance-by-day'}`}>
+          <div style={{ display: 'flex', padding: '16px' }}>
+            <div style={{ marginRight: '14px' }}>
+              <Select defaultValue={classId} style={{ width: 150 }} onChange={handleChange}>
+                {schoolYearClass.map((classData) => (
+                  <Option key={classData.id} value={classData.id}>
+                    {classData.className}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+            <Space direction="vertical">
+              <DatePicker
+                disabledDate={(date) => date.isBefore(dayjs())}
+                className="h-10"
+              />
+            </Space>
+            <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
+              Tất cả: {student.length}
+            </div>
+            <div className="border border-solid border-gray-300 w-40 flex justify-center items-center rounded-md h-10">
+              Có mặt: 38
+            </div>
+            <div className="mx-4 border border-solid border-gray-300 w-45 rounded-md flex items-center justify-center h-10">
+              Có phép: 0
+            </div>
+            <div className="border border-solid border-gray-300 w-52 rounded-md flex justify-center items-center h-10">
+              Không phép: 0
+            </div>
+            <div style={{ width: '560px' }}>
+              <Button type="primary" style={{ float: 'right', background: '#349634' }}>
+                Thông báo cho PH
+              </Button>
+            </div>
           </div>
-          <Space direction="vertical">
-            <DatePicker
-              disabledDate={(date) => date.isBefore(dayjs())}
-              className="h-10"
-            />
-          </Space>
-          <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
-            Tất cả: {student.length}
-          </div>
-          <div className="border border-solid border-gray-300 w-40 flex justify-center items-center rounded-md h-10">
-            Có mặt: 38
-          </div>
-          <div className="mx-4 border border-solid border-gray-300 w-45 rounded-md flex items-center justify-center h-10">
-            Có phép: 0
-          </div>
-          <div className="border border-solid border-gray-300 w-52 rounded-md flex justify-center items-center h-10">
-            Không phép: 0
-          </div>
-          <div style={{ width: '560px' }}>
-            <Button type="primary" style={{ float: 'right', background: '#349634' }}>
-              Thông báo cho PH
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <div className="list-student">
+              <Table
+                rowSelection={{ ...rowSelection }}
+                columns={columnsAttendenceByDay}
+                dataSource={dataAttendenceByDay}
+                pagination={false}
+                bordered
+                scroll={{ y: 385 }}
+              />
+            </div>
+          )}
+          <div className="submit">
+            <Button type="primary" className="btn-submit">
+              Lưu Lại
             </Button>
           </div>
         </div>
-        {isLoading ? (
-          <Loader />
-        ) : (
-          <div className="list-student">
-            <Table
-              rowSelection={{ ...rowSelection }}
-              columns={columnsAttendenceByDay}
-              dataSource={dataAttendenceByDay}
-              pagination={false}
-              bordered
-              scroll={{ y: 385 }}
-            />
-          </div>
-        )}
-        <div className="submit">
-          <Button type="primary" className="btn-submit">
-            Lưu Lại
-          </Button>
-        </div>
-      </div>
+      </Form>
       <div className={`${attendence !== 'attendance-by-month' ? 'hiddens' : 'attendance-by-month'}`}>
         <div style={{ display: 'flex', padding: '16px' }}>
           <div style={{ marginRight: '14px' }}>

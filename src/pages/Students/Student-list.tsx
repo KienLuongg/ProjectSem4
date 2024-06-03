@@ -14,6 +14,7 @@ import { Student } from '../../types/response';
 import teacherApi from '../../apis/urlApi';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
+import axios from 'axios';
 
 export default function Students() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -30,7 +31,11 @@ export default function Students() {
         setStudents(res?.data);
         setIsLoading(false);
       } catch (error) {
-        console.error('Failed to fetch students:', error);
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setStudents([]);
+        } else {
+          console.error('Failed to fetch school year classes:', error);
+        }
       }
     };
     fetchStudents();

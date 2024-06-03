@@ -12,8 +12,8 @@ import { NavLink } from 'react-router-dom';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import teacherApi from '../../apis/urlApi';
 import { TeacherClassSubjectData } from '../../types/response';
-import { render } from 'react-dom';
 import Loader from '../../common/Loader';
+import axios from 'axios';
 
 const App: React.FC = () => {
   const [teacherClassSubject, setTeacherClassSubject] = useState<TeacherClassSubjectData[]>([]);
@@ -28,7 +28,11 @@ const App: React.FC = () => {
         const res = await teacherApi.getTeacherSchoolYearClassSubject(idYear);
         setTeacherClassSubject(res?.data);
       } catch (error) {
-        console.error('Failed to fetch students:', error);
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setTeacherClassSubject([]);
+        } else {
+          console.error('Failed to fetch school year classes:', error);
+        }
       } finally {
         setIsLoading(false);
       }

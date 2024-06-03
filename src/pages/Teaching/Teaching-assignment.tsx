@@ -5,6 +5,7 @@ import teacherApi from '../../apis/urlApi';
 import { TeacherClassSubjectData, SchoolYearClassData, SchoolYearSubjectResponse } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
+import axios from 'axios';
 
 const AssignmentForm: React.FC = () => {
   const [form] = Form.useForm();
@@ -25,7 +26,11 @@ const AssignmentForm: React.FC = () => {
         const res = await teacherApi.getTeacherSchoolYearClassSubject(idYear);
         setTeacherClassSubject(res?.data);
       } catch (error) {
-        console.error('Failed to fetch teachers:', error);
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setTeacherClassSubject([]);
+        } else {
+          console.error('Failed to fetch school year classes:', error);
+        }
       } finally {
         setIsLoading(false);
       }

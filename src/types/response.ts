@@ -135,6 +135,7 @@ export interface SchoolYearClassData {
 
 export interface SchoolYearSubjectResponse {
   id: number;
+  classId: number;
   subject: {
     id: number;
     code: string;
@@ -226,6 +227,7 @@ export interface DataTypeAttendence {
   Co_Mat: JSX.Element;
   Nghi_Co_Phep: JSX.Element;
   Nghi_Khong_Phep: JSX.Element;
+  Ghi_Chu: JSX.Element;
   Trang_Thai: number
 }
 
@@ -334,16 +336,68 @@ export interface Lesson {
   teacherSchoolYearId: number;
   schoolYearClassId: number;
   schoolYearSubjectId: number;
-  teacherName: string;
-  className: string;
   subjectName: string;
+  teacherName: string;
+  teacherId: number;
+  className: string;
 }
 
 export interface Schedule {
-  T2?: Lesson;
-  T3?: Lesson;
-  T4?: Lesson;
-  T5?: Lesson;
-  T6?: Lesson;
+  indexLesson: number;
+  studyTime: string;
+  dayOfWeek: string;
+  note: string | null;
+  teacherSchoolYearId: number;
+  schoolYearClassId: number;
+  schoolYearSubjectId: number;
+  calendarReleaseId: number;
+  [key: string]: Lesson | any;
 }
 
+export interface SubjectForSchedule {
+  id: number;
+  teacher: {
+    teacherSchoolYearId: number;
+    name: string;
+    email: string;
+    phone: string;
+    subjects: string | null;
+    teacherType: string;
+  };
+  subject: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface FeeList {
+  id: number;
+  title: string;
+  term: string;
+  termName: string;
+  compel: boolean;
+  status: boolean;
+  refund: boolean;
+  exemption: boolean;
+  paymentTime: {
+    id: number;
+    name: string;
+    time: number;
+  };
+  schoolyear: {
+    id: number;
+    startSem1: Date;
+    startSem2: Date;
+    end: Date;
+  };
+  feePrices: {
+    id: number;
+    price: number;
+    gradeId: number | null;
+    unit: {
+      id: number;
+      name: string;
+      code: string;
+    };
+  }[];
+}

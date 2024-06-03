@@ -6,6 +6,7 @@ import { Schedule, SchoolYearClassData } from '../../types/response';
 import mainAxios from '../../apis/main-axios';
 import Loader from '../../common/Loader';
 import { YearContext } from '../../context/YearProvider/YearProvider';
+import axios from 'axios';
 
 const { Option } = Select;
 
@@ -26,7 +27,11 @@ const Timetable: React.FC = () => {
         const res = await mainAxios.get(`/api/v1/schedule/get-schedule-by?classId=${classId}`);
         setSchedule(res?.data);
       } catch (error) {
-        console.error('Failed to fetch schedule:', error);
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setSchedule([]);
+        } else {
+          console.error('Failed to fetch school year classes:', error);
+        }
       } finally {
         setIsLoading(false);
       }

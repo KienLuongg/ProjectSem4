@@ -19,6 +19,7 @@ import {
 } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
+import axios from 'axios';
 
 export default function SchoolYearClass() {
     const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
@@ -26,9 +27,7 @@ export default function SchoolYearClass() {
     const [form] = Form.useForm();
     const [grades, setGrades] = useState<GradeData[]>([]);
     const [rooms, setRooms] = useState<RoomData[]>([]);
-    const [teacherSchoolYears, setTeacherSchoolYears] = useState<
-        SchoolYearTeacherData[]
-    >([]);
+    const [teacherSchoolYears, setTeacherSchoolYears] = useState<SchoolYearTeacherData[]>([]);
     const { idYear } = useContext(YearContext);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -37,16 +36,19 @@ export default function SchoolYearClass() {
         fetchRooms();
     }, []);
 
-
     useEffect(() => {
         const fetchData = async () => {
             if (idYear === null) return;
             setIsLoading(true);
             try {
                 const res = await teacherApi.getSchoolYearClass(idYear);
-                setSchoolYearClass(res?.data);
+                setSchoolYearClass(res?.data || []);
             } catch (error) {
-                console.error('Failed to fetch students:', error);
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    setSchoolYearClass([]);
+                } else {
+                    console.error('Failed to fetch school year classes:', error);
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -75,6 +77,7 @@ export default function SchoolYearClass() {
                 console.error('Error fetching rooms:', error);
             });
     };
+
     useEffect(() => {
         const fetchTeacherSchoolYears = async () => {
             if (idYear === null) return;
@@ -83,7 +86,7 @@ export default function SchoolYearClass() {
                 const res = await teacherApi.getTeacherSchoolYear(idYear);
                 setTeacherSchoolYears(res?.data);
             } catch (error) {
-                console.error('Failed to fetch students:', error);
+                console.error('Failed to fetch teachers for the school year:', error);
             } finally {
                 setIsLoading(false);
             }
@@ -98,8 +101,6 @@ export default function SchoolYearClass() {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-
-    // const getSchoolYearId = parseInt(localStorage.getItem('idYear') ?? '0', 10);
 
     const handleSubmit = async () => {
         try {
@@ -170,7 +171,6 @@ export default function SchoolYearClass() {
                             >
                                 <Input />
                             </Form.Item>
-                            {/* Adjusted labels for the following form items */}
                             <Form.Item
                                 label="Khối học"
                                 name="gradeId"
@@ -227,9 +227,8 @@ export default function SchoolYearClass() {
             ) : (
                 <div>
                     <Row justify="space-between" className="mb-6">
-
                         <Table dataSource={schoolYearClass} rowKey="id" scroll={{ y: 450 }}
-                            className="w-full">
+                            className="w-full" locale={{ emptyText: 'No data available' }}>
                             <Table.Column title="STT" dataIndex="id" className="w-1" />
                             <Table.Column title="Tên lớp" dataIndex="className" />
                             <Table.Column title="Mã lớp" dataIndex="classCode" />
@@ -240,7 +239,6 @@ export default function SchoolYearClass() {
                                     `${record.grade.name}`
                                 }
                             />
-
                             <Table.Column
                                 title="Phòng học"
                                 dataIndex="room"
@@ -256,7 +254,6 @@ export default function SchoolYearClass() {
                                 }
                             />
                         </Table>
-
                     </Row>
                 </div>
             )}

@@ -7,12 +7,11 @@ import {
 } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
+import axios from 'axios';
 
 export default function SchoolYearSubject() {
     const [subjects, setSubjects] = useState<Subjects[]>([]);
-    const [schoolYearSubject, setSchoolYearSubject] = useState<
-        SchoolYearSubjectResponse[]
-    >([]);
+    const [schoolYearSubject, setSchoolYearSubject] = useState<SchoolYearSubjectResponse[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = React.useState(true);
@@ -30,7 +29,11 @@ export default function SchoolYearSubject() {
                 const res = await teacherApi.getSchoolYearSubject(idYear);
                 setSchoolYearSubject(res.data);
             } catch (error) {
-                console.error('Failed to fetch students:', error);
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    setSchoolYearSubject([]);
+                } else {
+                    console.error('Failed to fetch school year classes:', error);
+                }
             } finally {
                 setIsLoading(false);
             }

@@ -19,13 +19,14 @@ const SchoolYearSubject = lazy(() => import('../pages/Category/School-year-subje
 const SchoolYearTeacher = lazy(() => import('../pages/Category/Teacher-school-year'));
 const SubjectProgram = lazy(() => import('../pages/Category/Subject-program'));
 // const Profile = lazy(() => import('../pages/Profile'));
+const NoSchedule = lazy(() => import('../pages/Teaching/No-schedule'))
+const CreateSchedule = lazy(() => import('../pages/Teaching/Create-schedule'))
 const Schedule = lazy(() => import('../pages/Teaching/Schedules'))
 const TeachingAssign = lazy(() => import('../pages/Teaching/Teaching-assignment'))
 const AssignmentList = lazy(() => import('../pages/Teaching/Teaching-assign-list'))
 const Acknowledge = lazy(() => import('../pages/Acknowledge'))
 const Evaluate = lazy(() => import('../pages/Evaluate'))
-const tem1 = lazy(() => import('../pages/Teaching/Teaching-assignment2'))
-const tem2 = lazy(() => import('../pages/Category/Teacher-School-Year2'))
+const FeeList = lazy(() => import('../pages/Fee/Fee-list'))
 
 export const coreRoutes: RouteConfig[] = [
   {
@@ -55,49 +56,61 @@ export const coreRoutes: RouteConfig[] = [
   {
     path: '/school-year-subjects',
     component: SchoolYearSubject,
-    title: 'Attendance',
+    title: 'Subject',
     roles: ['ROLE_BGH'],
   },
   {
     path: '/school-year-teachers',
     component: SchoolYearTeacher,
-    title: 'Attendance',
+    title: 'School Year Teacher',
     roles: ['ROLE_BGH'],
   },
   {
     path: '/subject-program',
     component: SubjectProgram,
-    title: 'Attendance',
+    title: 'Subject Program',
     roles: ['ROLE_BGH'],
   },
   {
     path: '/assignment-list',
     component: AssignmentList,
-    title: 'Attendance',
+    title: 'Assignment List',
     roles: ['ROLE_BGH'],
   },
   {
     path: '/assignment',
     component: TeachingAssign,
-    title: 'Attendance',
+    title: 'Assignment',
     roles: ['ROLE_BGH'],
   },
   {
     path: '/schedule',
     component: Schedule,
-    title: 'Attendance',
+    title: 'Schedule',
+    roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/create-schedule',
+    component: CreateSchedule,
+    title: 'Create Schedule',
+    roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/no-schedule',
+    component: NoSchedule,
+    title: 'Schedule',
     roles: ['ROLE_BGH'],
   },
   {
     path: '/acknowledge',
     component: Acknowledge,
-    title: 'Attendance',
+    title: 'Acknowledge',
     roles: ['ROLE_GV', 'ROLE_BGH'],
   },
   {
     path: '/evaluate',
     component: Evaluate,
-    title: 'Attendance',
+    title: 'Evaluate',
     roles: ['ROLE_GV', 'ROLE_BGH'],
   },
   {
@@ -105,6 +118,12 @@ export const coreRoutes: RouteConfig[] = [
     component: Attendence,
     title: 'Attendance',
     roles: ['ROLE_GV', 'ROLE_BGH'],
+  },
+  {
+    path: '/fee-list',
+    component: FeeList,
+    title: 'Fee',
+    roles: ['ROLE_BGH'],
   }
 ]
 export default coreRoutes
