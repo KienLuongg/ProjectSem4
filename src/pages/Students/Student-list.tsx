@@ -31,7 +31,7 @@ export default function Students() {
         setStudents(res?.data);
         setIsLoading(false);
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
+        if (axios.isAxiosError(error) && error.response?.status === 2000) {
           setStudents([]);
         } else {
           console.error('Failed to fetch school year classes:', error);

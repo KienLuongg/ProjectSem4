@@ -26,7 +26,7 @@ const AssignmentForm: React.FC = () => {
         const res = await teacherApi.getTeacherSchoolYearClassSubject(idYear);
         setTeacherClassSubject(res?.data);
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
+        if (axios.isAxiosError(error) && error.response?.status === 2000) {
           setTeacherClassSubject([]);
         } else {
           console.error('Failed to fetch school year classes:', error);

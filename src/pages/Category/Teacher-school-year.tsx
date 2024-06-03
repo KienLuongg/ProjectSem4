@@ -33,7 +33,7 @@ export default function SchoolYearTeacher() {
                 const res = await teacherApi.getTeacherSchoolYear(idYear);
                 setSchoolYearTeachers(res.data);
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                if (axios.isAxiosError(error) && error.response?.status === 2000) {
                     setSchoolYearTeachers([]);
                 } else {
                     console.error('Failed to fetch school year classes:', error);

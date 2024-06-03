@@ -44,7 +44,7 @@ export default function SchoolYearClass() {
                 const res = await teacherApi.getSchoolYearClass(idYear);
                 setSchoolYearClass(res?.data || []);
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                if (axios.isAxiosError(error) && error.response?.status === 2000) {
                     setSchoolYearClass([]);
                 } else {
                     console.error('Failed to fetch school year classes:', error);

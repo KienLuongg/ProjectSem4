@@ -29,7 +29,7 @@ export default function SchoolYearSubject() {
                 const res = await teacherApi.getSchoolYearSubject(idYear);
                 setSchoolYearSubject(res.data);
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                if (axios.isAxiosError(error) && error.response?.status === 2000) {
                     setSchoolYearSubject([]);
                 } else {
                     console.error('Failed to fetch school year classes:', error);

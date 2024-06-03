@@ -27,7 +27,7 @@ const Timetable: React.FC = () => {
         const res = await mainAxios.get(`/api/v1/schedule/get-schedule-by?classId=${classId}`);
         setSchedule(res?.data);
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
+        if (axios.isAxiosError(error) && error.response?.status === 2000) {
           setSchedule([]);
         } else {
           console.error('Failed to fetch school year classes:', error);
@@ -143,7 +143,7 @@ const Timetable: React.FC = () => {
               </Select>
             </Col>
             <Col>
-              <Button type="primary">Export</Button>
+              <Button type="primary">Thông báo</Button>
             </Col>
           </Row>
 
