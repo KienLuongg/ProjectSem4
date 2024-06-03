@@ -8,6 +8,7 @@ import {
 } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
+import axios from 'axios';
 
 export default function SchoolYearTeacher() {
     const [schoolYearTeachers, setSchoolYearTeachers] = useState<SchoolYearTeacherData[]>([]);
@@ -31,8 +32,14 @@ export default function SchoolYearTeacher() {
             try {
                 const res = await teacherApi.getTeacherSchoolYear(idYear);
                 setSchoolYearTeachers(res.data);
-            } catch (error) {
-                console.error('Failed to fetch teachers:', error);
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    setSchoolYearTeachers([]);
+                } else if (error instanceof Error) {
+                    console.error('Failed to fetch school year classes:', error.message);
+                } else {
+                    console.error('An unknown error occurred.');
+                }
             } finally {
                 setIsLoading(false);
             }

@@ -6,7 +6,6 @@ import React, {
   useMemo,
   ReactNode,
 } from 'react';
-import mainAxios from '../../apis/main-axios';
 import teacherApi from '../../apis/urlApi';
 
 export type YearContextType = {
@@ -17,7 +16,7 @@ export type YearContextType = {
 
 export const YearContext = createContext<YearContextType>({
   idYear: null,
-  setIdYear: () => {},
+  setIdYear: () => { },
   schoolYears: [],
 });
 

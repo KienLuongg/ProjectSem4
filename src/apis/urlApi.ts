@@ -24,8 +24,12 @@ enum URL {
   GET_ROOMS = '/api/v1/school/get-rooms',
   //students
   GET_STUDENTS_YEARS = '/api/v1/student/get-student-year-info-by',
+  CREATE_ATENDENCE = '/api/v1/student/mark',
   //Schedule
   GET_SCHEDULE = '/api/v1/schedule/get-schedule-by',
+  GET_SCHEDULE_SUBJECTS = '/api/v1/schedule/get-teacher-class-subject',
+  //Fee
+  GET_FEE_LIST = '/api/v1/school-year-fee/getBy'
 }
 
 const teacherApi = {
@@ -90,6 +94,9 @@ const teacherApi = {
   }): Promise<IResponse<any>> => {
     return mainAxios.post(URL.CREATE_TEACHER_CLASS_SUBJECT, payload);
   },
+  postAtendence: (studentYearInfoId: number, status: boolean, note: string): Promise<IResponse<any>> => {
+    return mainAxios.post(`${URL.CREATE_ATENDENCE}?studentYearInfoId=${studentYearInfoId}&status=${status}${note ? `&note${note}` : ''}`);
+  },
   getSchoolYear: (): Promise<IResponse<any>> => {
     return mainAxios.get(URL.GET_SCHOOL_YEAR);
   },
@@ -121,8 +128,14 @@ const teacherApi = {
   getStudents: (id: number): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_STUDENTS_YEARS}?bySchoolYearId=${id}`);
   },
-  getSchedule: (id: number): Promise<IResponse<any>> => {
+  getSchedule: (): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_SCHEDULE}`)
-  }
+  },
+  getScheduleSubject: (): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_SCHEDULE_SUBJECTS}`)
+  },
+  getFeeList: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_FEE_LIST}?schoolYearId=${id}`)
+  },
 };
 export default teacherApi;
